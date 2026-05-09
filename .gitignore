@@ -1,0 +1,21 @@
+# Data
+*.csv
+*.json
+*.parquet
+RAW Data/
+Session Data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+.conda/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
