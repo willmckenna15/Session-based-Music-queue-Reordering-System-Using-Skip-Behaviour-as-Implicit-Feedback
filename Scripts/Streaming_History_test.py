@@ -1,14 +1,15 @@
 from session_compiler import session_compiler
 import pandas as pd
 import numpy as np
-import openpyxl
 from openpyxl.chart import LineChart, Reference, BarChart
 from openpyxl.styles import Border, Side, Font, PatternFill
+from openpyxl.chart.legend import Legend
+from openpyxl.chart.layout import Layout, ManualLayout
 
 while True:
     user_id = input("First four letters of UUID: ")
     try:
-        df = pd.read_csv(f"../Raw Data/Streaming_History_{user_id}.csv").copy()
+        df = pd.read_csv(f"../Raw Data/Audio_Streaming_History_{user_id}.csv").copy()
     except FileNotFoundError:
         print(f"No file found for UUID: {user_id}")
         continue
@@ -84,11 +85,16 @@ most_listened_artists_df = (
 past_year_listens = df[df["ts"] >= pd.Timestamp("2025-05-01", tz="UTC")].copy()
 past_year_listens["hour"] = past_year_listens["ts"].dt.hour
 
+audio_features = ["danceability", "energy", "speechiness", 
+                  "acousticness", "instrumentalness", "liveness", "valence",  "loudness",
+                  "tempo", "key", "mode"]
+
 hourly_plays = (
     past_year_listens.groupby("hour")
     .agg(
         total_plays=("ts", "count"),
-        skips=("reason_end", lambda x: x.isin(["fwdbtn", "clickrow"]).sum())
+        skips=("reason_end", lambda x: x.isin(["fwdbtn", "clickrow"]).sum()),
+        **{feature: (feature, "mean") for feature in audio_features}
     )
     .reset_index()
     .rename(columns={"hour": "Hour"})
@@ -97,6 +103,32 @@ hourly_plays = (
 hourly_plays["Percentage of Plays"] = hourly_plays["total_plays"] / len(past_year_listens) * 100
 hourly_plays["Skip Rate"] = hourly_plays["skips"] / hourly_plays["total_plays"] * 100
 hourly_plays = hourly_plays.drop(columns=["total_plays", "skips"])
+
+hourly_plays = hourly_plays[["Hour", "Percentage of Plays", "Skip Rate"] + audio_features]
+hour_order = list(range(5, 24)) + list(range(0, 5))
+hourly_plays = hourly_plays.set_index("Hour").reindex(hour_order).reset_index()
+
+df_m = df.copy()
+
+df_m["Month"] = df_m["ts"].dt.to_period("M").astype(str)
+
+monthly_moods = (
+    df_m.groupby("Month")
+    .agg(
+        **{feature: (feature, "mean") for feature in audio_features}
+    )
+    .reset_index()
+)
+
+monthly_moods = monthly_moods[["Month"] + audio_features]
+mood_features_to_smooth = ["danceability", "energy", "speechiness",
+                            "acousticness", "instrumentalness", "liveness", "valence"]
+
+monthly_moods[mood_features_to_smooth] = (
+    monthly_moods[mood_features_to_smooth]
+    .rolling(window=12, center=True, min_periods=1)
+    .mean()
+)
 
 discovered_songs = df.drop_duplicates(
     subset=["Track Name", "Artist Name"],
@@ -110,6 +142,13 @@ daily_discovered_songs = (
     .size()
     .rename("Amount of new songs found")
     .reset_index()
+)
+
+Month_analysis = daily_discovered_songs.merge(
+    monthly_moods[["Month"]+audio_features],
+    left_on="Month",
+    right_on="Month",
+    how="left"
 )
 
 def format_pct_column(worksheet, df_out, col_name):
@@ -126,7 +165,7 @@ with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
     most_listened_songs_df.to_excel(writer, sheet_name="Most Played Songs", index=False)
     most_skipped_artists_df.to_excel(writer, sheet_name="Most Skipped Artists", index=False)
     most_listened_artists_df.to_excel(writer, sheet_name="Most Played Artists", index=False)
-    daily_discovered_songs.to_excel(writer, sheet_name="No. songs discovered by Month", index=False)
+    Month_analysis.to_excel(writer, sheet_name="Plays by Month", index=False)
     hourly_plays.to_excel(writer, sheet_name="Plays throughout the day", index=False)
 
     sheets = {
@@ -134,7 +173,7 @@ with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
         "Most Played Songs": most_listened_songs_df,
         "Most Skipped Artists": most_skipped_artists_df,
         "Most Played Artists": most_listened_artists_df,
-        "No. songs discovered by Month": daily_discovered_songs,
+        "Plays by Month": Month_analysis,
         "Plays throughout the day": hourly_plays
     }
 
@@ -151,6 +190,7 @@ with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
             )
             adjusted_width = min(max_length + 2, 50)
             worksheet.column_dimensions[column_cells[0].column_letter].width = adjusted_width
+
 
     hourly_worksheet = writer.sheets["Plays throughout the day"]
     hourly_chart = BarChart()
@@ -178,12 +218,54 @@ with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
     hourly_chart.style = 2
     hourly_chart.series[0].graphicalProperties.line.solidFill = "4472C4"
     hourly_chart.series[0].graphicalProperties.line.width = 25000
-    hourly_worksheet.add_chart(hourly_chart, "E3")
+    hourly_worksheet.add_chart(hourly_chart, "A27")
 
-    worksheet = writer.sheets["No. songs discovered by Month"]
+    mood_chart = LineChart()
+    mood_chart.title = "Moods throughout the day"
+    mood_chart.y_axis.title = "Audio_feature_score"
+    mood_chart.x_axis.title = "Hour of Day"
+    mood_chart.width = 40
+    mood_chart.height = 20
+    mood_chart.legend = Legend()
+    mood_chart.x_axis.number_format = "0"
+    mood_chart.x_axis.tickLblPos = "low"
+    mood_chart.y_axis.number_format = "0.00"
+    mood_chart.y_axis.tickLblPos = "nextTo"
+
+    m_data = Reference(hourly_worksheet, min_col=4, max_col=10, min_row=1, max_row=25)
+    m_labels = Reference(hourly_worksheet, min_col=1, max_col=1, min_row=2, max_row=25)
+
+    mood_chart.add_data(m_data, titles_from_data=True, from_rows=False)
+    mood_chart.set_categories(m_labels)
+    mood_chart.x_axis.tickLblSkip = 6
+    mood_chart.y_axis.scaling.min = 0
+    mood_chart.y_axis.majorGridlines = None
+    mood_chart.x_axis.delete = False
+    mood_chart.y_axis.delete = False
+    mood_chart.style = 2
+    mood_chart.series[0].graphicalProperties.line.solidFill = "4472C4"
+    mood_chart.series[0].graphicalProperties.line.width = 25000
+    hourly_worksheet.add_chart(mood_chart, "A66")
+
+    mood_chart.legend.layout = Layout(
+        manualLayout=ManualLayout(
+            x=0.85,
+            y=0,
+            w=0.15,
+            h=0.4,
+            xMode="factor",
+            yMode="factor",
+        )
+    )
+    mood_chart.legend.overlay = False
+
+
+
+
+    worksheet = writer.sheets["Plays by Month"]
     worksheet.sheet_state = "hidden"
 
-    num_rows = len(daily_discovered_songs) + 1
+    num_rows = len(Month_analysis) + 1
 
     chart = LineChart()
     chart.title = "Songs Discovered by Month"
@@ -212,8 +294,47 @@ with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
     chart.series[0].graphicalProperties.line.solidFill = "4472C4"
     chart.series[0].graphicalProperties.line.width = 25000
 
-    chart_ws = writer.book.create_sheet("Songs Discovered by Month")
+    chart_ws = writer.book.create_sheet("Songs played by Month")
     chart_ws.add_chart(chart, "A1")
+
+    m_mood_chart = LineChart()
+    m_mood_chart.title = "Moods throughout History"
+    m_mood_chart.y_axis.title = "Audio_feature_score"
+    m_mood_chart.x_axis.title = "Month"
+    m_mood_chart.width = 40
+    m_mood_chart.height = 20
+    m_mood_chart.legend = Legend()
+    m_mood_chart.x_axis.number_format = "0"
+    m_mood_chart.x_axis.tickLblPos = "low"
+    m_mood_chart.y_axis.number_format = "0.00"
+    m_mood_chart.y_axis.tickLblPos = "nextTo"
+
+    m_m_data = Reference(worksheet, min_col=3, max_col=9, min_row=1, max_row=num_rows)
+    m_m_labels = Reference(worksheet, min_col=1, max_col=1, min_row=2, max_row=num_rows)
+
+    m_mood_chart.add_data(m_m_data, titles_from_data=True, from_rows=False)
+    m_mood_chart.set_categories(m_m_labels)
+    m_mood_chart.x_axis.tickLblSkip = 6
+    m_mood_chart.y_axis.scaling.min = 0
+    m_mood_chart.y_axis.majorGridlines = None
+    m_mood_chart.x_axis.delete = False
+    m_mood_chart.y_axis.delete = False
+    m_mood_chart.style = 2
+    m_mood_chart.series[0].graphicalProperties.line.solidFill = "4472C4"
+    m_mood_chart.series[0].graphicalProperties.line.width = 25000
+    chart_ws.add_chart(m_mood_chart, "A40")
+
+    m_mood_chart.legend.layout = Layout(
+        manualLayout=ManualLayout(
+            x=0.85,
+            y=0,
+            w=0.15,
+            h=0.4,
+            xMode="factor",
+            yMode="factor",
+        )
+    )
+    m_mood_chart.legend.overlay = False
 
     thin = Side(style="thin")
     thick = Side(style="thick")
