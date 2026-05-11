@@ -4,6 +4,7 @@
 *.parquet
 RAW Data/
 Session Data/
+Data Collection.xlsx
 
 # Python
 __pycache__/
