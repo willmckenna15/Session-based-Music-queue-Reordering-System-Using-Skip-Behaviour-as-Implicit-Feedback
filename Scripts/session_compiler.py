@@ -1,17 +1,22 @@
 import pandas as pd
 from datetime import timedelta
 
+
 def build_sessions(df):
     streaming_sessions = {}
     session_no = 1
+    print("Filtering for shuffled sessions...")
     shuffle_sessions = df[df["shuffle"] == True].copy()
+    print("Filter completed")
     shuffle_sessions["ts"] = pd.to_datetime(shuffle_sessions["ts"])
     shuffle_sessions = shuffle_sessions.sort_values("ts").reset_index(drop=True)
 
+    print("Grouping Sessions...")
     for i in range(len(shuffle_sessions) - 1):
         streaming_sessions.setdefault(session_no, []).append(shuffle_sessions.iloc[i].to_dict())
         if shuffle_sessions.iloc[i + 1]["ts"] - shuffle_sessions.iloc[i]["ts"] >= timedelta(minutes=30):
             session_no += 1
+    print("Sessions Grouped")
 
     streaming_sessions.setdefault(session_no, []).append(shuffle_sessions.iloc[-1].to_dict())
     return streaming_sessions
@@ -27,8 +32,12 @@ def is_valid_session(songs):
 
 def session_compiler():
     df = pd.read_csv("../RAW Data/Combined_Streaming_History.csv")
-    streaming_sessions = build_sessions(df)
 
+    print("Constucting Sessions...")
+    streaming_sessions = build_sessions(df)
+    print("Sessions Contstructed")
+
+    print("Applying Primary Filters...")
     valid = {k: v for k, v in streaming_sessions.items() if is_valid_session(v)}
 
     Filtered_sessions = pd.DataFrame([
@@ -44,12 +53,13 @@ def session_compiler():
     valid_sessions = Filtered_sessions["session_id"].nunique()
     song_count = len(Filtered_sessions)
     agg_skip_count = Filtered_sessions["reason_end"].isin(["fwdbtn", "clickrow"]).sum()
-
+    print("Sessions Filtered")
     return Filtered_sessions, valid_sessions, song_count, agg_skip_count
 
-if __name__ == "__main__":
+def main():
     Filtered_sessions, valid_sessions, song_count, agg_skip_count = session_compiler()
 
+    print("Formatting Analysis...")
     if not Filtered_sessions.empty:
         user_stats = Filtered_sessions.groupby("user_id").agg(
             valid_sessions=("session_id", "nunique"),
@@ -68,10 +78,15 @@ if __name__ == "__main__":
         except (FileNotFoundError, pd.errors.EmptyDataError):
             sessions_df = pd.DataFrame(columns=["UUID", "Number of Sessions", "Average Songs per Session", "Skip Rate"])
 
+        print("writing to csv..")
         sessions_df = pd.concat([sessions_df, user_stats], ignore_index=True)
         sessions_df.to_csv(session_file, index=False)
+        print("csv saved")
 
         print(user_stats)
         print(f"\nTotal valid sessions: {valid_sessions}")
         print(f"\nNumber of songs: {song_count}")
         print(f"\nBaseline Skip Rate: {agg_skip_count / song_count * 100:.2f}%")
+
+if __name__ == "__main__":
+    main()

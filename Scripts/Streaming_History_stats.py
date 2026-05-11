@@ -1,0 +1,396 @@
+from session_compiler import session_compiler
+import pandas as pd
+import numpy as np
+from openpyxl.chart import LineChart, Reference, BarChart
+from openpyxl.styles import Border, Side, Font, PatternFill
+from openpyxl.chart.legend import Legend
+from openpyxl.chart.layout import Layout, ManualLayout
+
+def main(user_id):
+    while True:
+        try:
+            a_df = pd.read_csv(f"../Volunteer Data/RAW/Audio_Streaming_History_{user_id}.csv").copy()
+            f_df = pd.read_csv(f"../Volunteer Data/RAW/Streaming_History_{user_id}.csv").copy()
+        except FileNotFoundError:
+            print(f"No file found for name: {user_id}")
+            continue
+        break
+
+    f_df = f_df.rename(columns={
+        "master_metadata_track_name": "Track Name",
+        "master_metadata_album_artist_name": "Artist Name"
+    })
+
+    a_df = a_df.rename(columns={
+        "master_metadata_track_name": "Track Name",
+        "master_metadata_album_artist_name": "Artist Name"
+    })
+
+    a_df["ts"] = pd.to_datetime(a_df["ts"])
+    a_df["date"] = a_df["ts"].dt.date
+    a_df["time"] = a_df["ts"].dt.time
+
+    f_df["ts"] = pd.to_datetime(f_df["ts"])
+    f_df["date"] = f_df["ts"].dt.date
+    f_df["time"] = f_df["ts"].dt.time
+
+    most_listened_songs = (
+        f_df.groupby(["Track Name", "Artist Name"])
+        .size()
+        .rename("Play Count")
+    )
+
+    most_listened_artists = (
+        f_df.groupby(["Artist Name"])
+        .size()
+        .rename("Play Count")
+    )
+
+    df_skipped = f_df[
+        (f_df["reason_end"] == "fwdbtn") |
+        (f_df["reason_end"] == "clickrow")
+    ].copy()
+
+    skip_counts_songs = (
+        df_skipped.groupby(["Track Name", "Artist Name"])
+        .size()
+        .rename("Skip Count")
+    )
+
+    skip_counts_artists = (
+        df_skipped.groupby(["Artist Name"])
+        .size()
+        .rename("Skip Count")
+    )
+
+    songs_df = pd.concat([most_listened_songs, skip_counts_songs], axis=1).fillna(0)
+    songs_df["Skip Rate"] = songs_df["Skip Count"] / songs_df["Play Count"] * 100
+
+    most_skipped_songs_df = (
+        songs_df[songs_df["Play Count"] >= 30]
+        .sort_values("Skip Rate", ascending=False)
+        .head(50)
+        .reset_index()
+    )
+
+    least_skipped_songs_df = (
+        songs_df[songs_df["Play Count"] >= 30]
+        .sort_values("Skip Rate", ascending=True)
+        .head(50)
+        .reset_index()
+    )
+
+    most_listened_songs_df = (
+        songs_df.sort_values("Play Count", ascending=False)
+        .reset_index()
+    )
+
+    artists_df = pd.concat([most_listened_artists, skip_counts_artists], axis=1).fillna(0)
+    artists_df["Skip Rate"] = artists_df["Skip Count"] / artists_df["Play Count"] * 100
+
+    most_skipped_artists_df = (
+        artists_df[artists_df["Play Count"] >= 30]
+        .sort_values("Skip Rate", ascending=False)
+        .reset_index()
+    )
+
+    least_skipped_artists_df = (
+        artists_df[artists_df["Play Count"] >= 30]
+        .sort_values("Skip Rate", ascending=True)
+        .reset_index()
+    )
+
+    most_listened_artists_df = (
+        artists_df.sort_values("Play Count", ascending=False)
+        .reset_index()
+    )
+
+    past_year_listens = a_df[a_df["ts"] >= pd.Timestamp("2025-05-01", tz="UTC")].copy()
+    past_year_listens["hour"] = past_year_listens["ts"].dt.hour
+
+    audio_features = ["danceability", "energy", "speechiness", 
+                    "acousticness", "instrumentalness", "liveness", "valence",  "loudness",
+                    "tempo", "key", "mode"]
+
+    hourly_plays = (
+        past_year_listens.groupby("hour")
+        .agg(
+            total_plays=("ts", "count"),
+            skips=("reason_end", lambda x: x.isin(["fwdbtn", "clickrow"]).sum()),
+            **{feature: (feature, "mean") for feature in audio_features}
+        )
+        .reset_index()
+        .rename(columns={"hour": "Hour"})
+    )
+
+    hourly_plays["Percentage of Plays"] = hourly_plays["total_plays"] / len(past_year_listens) * 100
+    hourly_plays["Skip Rate"] = hourly_plays["skips"] / hourly_plays["total_plays"] * 100
+    hourly_plays = hourly_plays.drop(columns=["total_plays", "skips"])
+
+    hourly_plays = hourly_plays[["Hour", "Percentage of Plays", "Skip Rate"] + audio_features]
+    hour_order = list(range(5, 24)) + list(range(0, 5))
+    hourly_plays = hourly_plays.set_index("Hour").reindex(hour_order).reset_index()
+
+    df_m = a_df.copy()
+
+    df_m["Month"] = df_m["ts"].dt.to_period("M").astype(str)
+
+    monthly_moods = (
+        df_m.groupby("Month")
+        .agg(
+            **{feature: (feature, "mean") for feature in audio_features}
+        )
+        .reset_index()
+    )
+
+    monthly_moods = monthly_moods[["Month"] + audio_features]
+    mood_features_to_smooth = ["danceability", "energy", "speechiness",
+                                "acousticness", "instrumentalness", "liveness", "valence"]
+
+    monthly_moods[mood_features_to_smooth] = (
+        monthly_moods[mood_features_to_smooth]
+        .rolling(window=12, center=True, min_periods=1)
+        .mean()
+    )
+
+    discovered_songs = a_df.drop_duplicates(
+        subset=["Track Name", "Artist Name"],
+        keep="first"
+    ).copy()
+
+    discovered_songs["Month"] = discovered_songs["ts"].dt.to_period("M").astype(str)
+
+    daily_discovered_songs = (
+        discovered_songs.groupby("Month")
+        .size()
+        .rename("Amount of new songs found")
+        .reset_index()
+    )
+
+    Month_analysis = daily_discovered_songs.merge(
+        monthly_moods[["Month"]+audio_features],
+        left_on="Month",
+        right_on="Month",
+        how="left"
+    )
+
+    def format_pct_column(worksheet, df_out, col_name):
+        for cell in worksheet[1]:
+            if cell.value == col_name:
+                for row in range(2, len(df_out) + 2):
+                    worksheet.cell(row=row, column=cell.column).number_format = '0.00"%"'
+                break
+
+    output_path = f"../Volunteer Data/Spotify Stats/{user_id}'s Spotify Stats.xlsx"
+
+    with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
+        most_skipped_songs_df.to_excel(writer, sheet_name="Most Skipped Songs", index=False)
+        least_skipped_songs_df.to_excel(writer, sheet_name="Least Skipped Songs", index=False)
+        most_listened_songs_df.to_excel(writer, sheet_name="Most Played Songs", index=False)
+        most_skipped_artists_df.to_excel(writer, sheet_name="Most Skipped Artists", index=False)
+        least_skipped_artists_df.to_excel(writer, sheet_name="Least Skipped Artists", index=False)
+        most_listened_artists_df.to_excel(writer, sheet_name="Most Played Artists", index=False)
+        Month_analysis.to_excel(writer, sheet_name="Plays by Month", index=False)
+        hourly_plays.to_excel(writer, sheet_name="Plays throughout the day", index=False)
+
+        sheets = {
+            "Most Skipped Songs": most_skipped_songs_df,
+            "Least Skipped Songs": least_skipped_songs_df,
+            "Most Played Songs": most_listened_songs_df,
+            "Most Skipped Artists": most_skipped_artists_df, 
+            "Least Skipped Artists": least_skipped_artists_df,
+            "Most Played Artists": most_listened_artists_df,
+            "Plays by Month": Month_analysis,
+            "Plays throughout the day": hourly_plays
+        }
+
+        for sheet_name, df_out in sheets.items():
+            worksheet = writer.sheets[sheet_name]
+
+            format_pct_column(worksheet, df_out, "Skip Rate")
+            format_pct_column(worksheet, df_out, "Percentage of Plays")
+
+            for column_cells in worksheet.columns:
+                max_length = max(
+                    len(str(cell.value)) if cell.value is not None else 0
+                    for cell in column_cells
+                )
+                adjusted_width = min(max_length + 2, 50)
+                worksheet.column_dimensions[column_cells[0].column_letter].width = adjusted_width
+
+
+        hourly_worksheet = writer.sheets["Plays throughout the day"]
+        hourly_chart = BarChart()
+        hourly_chart.title = "Percentage of plays throughout the day"
+        hourly_chart.y_axis.title = "Plays"
+        hourly_chart.x_axis.title = "Hour of Day"
+        hourly_chart.width = 40
+        hourly_chart.height = 20
+        hourly_chart.legend = None
+        hourly_chart.x_axis.number_format = "0"
+        hourly_chart.x_axis.tickLblPos = "low"
+        hourly_chart.y_axis.number_format = "0"
+        hourly_chart.y_axis.tickLblPos = "nextTo"
+
+        h_data = Reference(hourly_worksheet, min_col=2, max_col=2, min_row=1, max_row=25)
+        h_labels = Reference(hourly_worksheet, min_col=1, max_col=1, min_row=2, max_row=25)
+
+        hourly_chart.add_data(h_data, titles_from_data=True, from_rows=False)
+        hourly_chart.set_categories(h_labels)
+        hourly_chart.x_axis.tickLblSkip = 6
+        hourly_chart.y_axis.scaling.min = 0
+        hourly_chart.y_axis.majorGridlines = None
+        hourly_chart.x_axis.delete = False
+        hourly_chart.y_axis.delete = False
+        hourly_chart.style = 2
+        hourly_chart.series[0].graphicalProperties.line.solidFill = "4472C4"
+        hourly_chart.series[0].graphicalProperties.line.width = 25000
+        hourly_worksheet.add_chart(hourly_chart, "A27")
+
+        mood_chart = LineChart()
+        mood_chart.title = "Moods throughout the day"
+        mood_chart.y_axis.title = "Audio_feature_score"
+        mood_chart.x_axis.title = "Hour of Day"
+        mood_chart.width = 40
+        mood_chart.height = 20
+        mood_chart.legend = Legend()
+        mood_chart.x_axis.number_format = "0"
+        mood_chart.x_axis.tickLblPos = "low"
+        mood_chart.y_axis.number_format = "0.00"
+        mood_chart.y_axis.tickLblPos = "nextTo"
+
+        m_data = Reference(hourly_worksheet, min_col=4, max_col=10, min_row=1, max_row=25)
+        m_labels = Reference(hourly_worksheet, min_col=1, max_col=1, min_row=2, max_row=25)
+
+        mood_chart.add_data(m_data, titles_from_data=True, from_rows=False)
+        mood_chart.set_categories(m_labels)
+        mood_chart.x_axis.tickLblSkip = 6
+        mood_chart.y_axis.scaling.min = 0
+        mood_chart.y_axis.majorGridlines = None
+        mood_chart.x_axis.delete = False
+        mood_chart.y_axis.delete = False
+        mood_chart.style = 2
+        mood_chart.series[0].graphicalProperties.line.solidFill = "4472C4"
+        mood_chart.series[0].graphicalProperties.line.width = 25000
+        hourly_worksheet.add_chart(mood_chart, "A66")
+
+        mood_chart.legend.layout = Layout(
+            manualLayout=ManualLayout(
+                x=0.85,
+                y=0,
+                w=0.15,
+                h=0.4,
+                xMode="factor",
+                yMode="factor",
+            )
+        )
+        mood_chart.legend.overlay = False
+
+
+
+
+        worksheet = writer.sheets["Plays by Month"]
+        worksheet.sheet_state = "hidden"
+
+        num_rows = len(Month_analysis) + 1
+
+        chart = LineChart()
+        chart.title = "Songs Discovered by Month"
+        chart.y_axis.title = "Songs"
+        chart.x_axis.title = "Month"
+        chart.width = 40
+        chart.height = 20
+        chart.legend = None
+        chart.varyColors = False
+        chart.x_axis.number_format = "yyyy-mm"
+        chart.x_axis.tickLblPos = "low"
+        chart.y_axis.numFmt = "0"
+        chart.y_axis.tickLblPos = "nextTo"
+
+        data = Reference(worksheet, min_col=2, max_col=2, min_row=1, max_row=num_rows)
+        labels = Reference(worksheet, min_col=1, max_col=1, min_row=2, max_row=num_rows)
+
+        chart.add_data(data, titles_from_data=True, from_rows=False)
+        chart.set_categories(labels)
+        chart.x_axis.tickLblSkip = 6
+        chart.y_axis.scaling.min = 0
+        chart.y_axis.majorGridlines = None
+        chart.x_axis.delete = False
+        chart.y_axis.delete = False
+        chart.style = 2
+        chart.series[0].graphicalProperties.line.solidFill = "472C4"
+        chart.series[0].graphicalProperties.line.width = 25000
+
+        chart_ws = writer.book.create_sheet("Songs played by Month")
+        chart_ws.add_chart(chart, "A1")
+
+        m_mood_chart = LineChart()
+        m_mood_chart.title = "Moods throughout History"
+        m_mood_chart.y_axis.title = "Audio_feature_score"
+        m_mood_chart.x_axis.title = "Month"
+        m_mood_chart.width = 40
+        m_mood_chart.height = 20
+        m_mood_chart.legend = Legend()
+        m_mood_chart.x_axis.number_format = "0"
+        m_mood_chart.x_axis.tickLblPos = "low"
+        m_mood_chart.y_axis.number_format = "0.00"
+        m_mood_chart.y_axis.tickLblPos = "nextTo"
+
+        m_m_data = Reference(worksheet, min_col=3, max_col=9, min_row=1, max_row=num_rows)
+        m_m_labels = Reference(worksheet, min_col=1, max_col=1, min_row=2, max_row=num_rows)
+
+        m_mood_chart.add_data(m_m_data, titles_from_data=True, from_rows=False)
+        m_mood_chart.set_categories(m_m_labels)
+        m_mood_chart.x_axis.tickLblSkip = 6
+        m_mood_chart.y_axis.scaling.min = 0
+        m_mood_chart.y_axis.majorGridlines = None
+        m_mood_chart.x_axis.delete = False
+        m_mood_chart.y_axis.delete = False
+        m_mood_chart.style = 2
+        m_mood_chart.series[0].graphicalProperties.line.solidFill = "4472C4"
+        m_mood_chart.series[0].graphicalProperties.line.width = 25000
+        chart_ws.add_chart(m_mood_chart, "A40")
+
+        m_mood_chart.legend.layout = Layout(
+            manualLayout=ManualLayout(
+                x=0.85,
+                y=0,
+                w=0.15,
+                h=0.4,
+                xMode="factor",
+                yMode="factor",
+            )
+        )
+        m_mood_chart.legend.overlay = False
+
+        thin = Side(style="thin")
+        thick = Side(style="thick")
+        header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+
+        for sheet in writer.book.worksheets:
+            if sheet.sheet_state == "hidden":
+                continue
+
+            min_row = sheet.min_row
+            max_row = sheet.max_row
+            min_col = sheet.min_column
+            max_col = sheet.max_column
+
+            for row in sheet.iter_rows(min_row=min_row, max_row=max_row, min_col=min_col, max_col=max_col):
+                for cell in row:
+                    if cell.value is not None:
+                        left = thick if cell.column == min_col else thin
+                        right = thick if cell.column == max_col else thin
+                        top = thick if cell.row == min_row else thin
+                        bottom = thick if cell.row == max_row or cell.row == min_row else thin
+
+                        cell.border = Border(left=left, right=right, top=top, bottom=bottom)
+
+                        if cell.row == min_row:
+                            cell.font = Font(bold=True, color="FFFFFF")
+                            cell.fill = header_fill
+
+    print("Stats are published")
+
+if __name__ == "__main__":
+    main()
