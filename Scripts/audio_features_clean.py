@@ -35,8 +35,9 @@ def main():
 
     print("Normalising Dataset")
     scaler = StandardScaler()
-    cols_to_normalise = ['danceability', 'energy', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence']
+    cols_to_normalise = ['danceability', 'energy', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'loudness','tempo']
     Streaming_history[cols_to_normalise] = scaler.fit_transform(Streaming_history[cols_to_normalise])
+    Streaming_history = pd.get_dummies(Streaming_history, columns=['key'])
     print("Data Normalised")
 
     print("Writing to csv...")

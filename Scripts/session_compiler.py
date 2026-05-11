@@ -5,20 +5,28 @@ from datetime import timedelta
 def build_sessions(df):
     streaming_sessions = {}
     session_no = 1
+
     print("Filtering for shuffled sessions...")
     shuffle_sessions = df[df["shuffle"] == True].copy()
     print("Filter completed")
+
     shuffle_sessions["ts"] = pd.to_datetime(shuffle_sessions["ts"])
-    shuffle_sessions = shuffle_sessions.sort_values("ts").reset_index(drop=True)
+    users = shuffle_sessions['user_id'].unique().tolist()
+    user_no = 1
+    for user in users:
+        print(f"Constructing sessions for volunteer {user_no}..")
+        user_shuffle_sessions = shuffle_sessions[shuffle_sessions["user_id"] == user].sort_values(["ts"],).reset_index(drop=True)
+        for j in range(len(user_shuffle_sessions) - 1):
+            streaming_sessions.setdefault(session_no, []).append(user_shuffle_sessions.iloc[j].to_dict())
+            if user_shuffle_sessions.iloc[j + 1]["ts"] - user_shuffle_sessions.iloc[j]["ts"] >= timedelta(minutes=30):
+                session_no += 1
+        # outside inner loop — append last row for this user
+        streaming_sessions.setdefault(session_no, []).append(user_shuffle_sessions.iloc[-1].to_dict())
+        session_no += 1
+        user_no += 1
+          # prevent bleed into next user
+    print("All Sessions Constructed")
 
-    print("Grouping Sessions...")
-    for i in range(len(shuffle_sessions) - 1):
-        streaming_sessions.setdefault(session_no, []).append(shuffle_sessions.iloc[i].to_dict())
-        if shuffle_sessions.iloc[i + 1]["ts"] - shuffle_sessions.iloc[i]["ts"] >= timedelta(minutes=30):
-            session_no += 1
-    print("Sessions Grouped")
-
-    streaming_sessions.setdefault(session_no, []).append(shuffle_sessions.iloc[-1].to_dict())
     return streaming_sessions
 
 def is_valid_session(songs):
@@ -33,11 +41,10 @@ def is_valid_session(songs):
 def session_compiler():
     df = pd.read_csv("../RAW Data/Combined_Streaming_History.csv")
 
-    print("Constucting Sessions...")
+    
     streaming_sessions = build_sessions(df)
-    print("Sessions Contstructed")
 
-    print("Applying Primary Filters...")
+    print("Applying Secondary Filters...")
     valid = {k: v for k, v in streaming_sessions.items() if is_valid_session(v)}
 
     Filtered_sessions = pd.DataFrame([
@@ -59,7 +66,7 @@ def session_compiler():
 def main():
     Filtered_sessions, valid_sessions, song_count, agg_skip_count = session_compiler()
 
-    print("Formatting Analysis...")
+    print("Formatting Statistics...")
     if not Filtered_sessions.empty:
         user_stats = Filtered_sessions.groupby("user_id").agg(
             valid_sessions=("session_id", "nunique"),
@@ -73,6 +80,7 @@ def main():
         })
 
         session_file = "../Session Data.csv"
+        
         try:
             sessions_df = pd.read_csv(session_file)
         except (FileNotFoundError, pd.errors.EmptyDataError):

@@ -9,6 +9,8 @@ files = glob.glob("../RAW Data/Streaming_history_*.csv")
 for f in files:
     os.remove(f)
 print("Pre-existing files removed")
+os.remove("../RAW Data/Combined_Streaming_History.csv")
+os.remove("../Session Data.csv")
 
 print("\033[1;4mCombining RAW Datasets\033[0m")
 Project_Json2csv.main()
