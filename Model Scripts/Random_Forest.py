@@ -39,13 +39,27 @@ validation_df["historical_skip_rate"] = validation_df["historical_skip_rate"].fi
 X_val = validation_df[features]
 Y_val = validation_df[target]
 
+# Hyper-Paramater Selection
+'''
 param_grid = {
     'max_depth': [8,10,12,15],
     'min_samples_leaf': [10,20,30],
     'n_estimators': [100,200,300]
 }
+model = ExtraTreesClassifier(random_state=42)
+grid_search = GridSearchCV(model, param_grid, scoring='roc_auc', cv=3, n_jobs=-1, verbose=1)
+grid_search.fit(X, Y)
 
-model = ExtraTreesClassifier(random_state = 42, min_samples_leaf=10, max_depth = 15, n_estimators=350)
+print(f"Best params: {grid_search.best_params_}")
+print(f"Best CV AUC: {grid_search.best_score_:.3f}")
+
+best_model = grid_search.best_estimator_
+probs = best_model.predict_proba(X_val)[:, 1]
+auc = roc_auc_score(Y_val, probs)
+print(f"Validation AUC: {auc:.3f}")
+'''
+
+model = ExtraTreesClassifier(random_state = 42, min_samples_leaf=10, max_depth = 15, n_estimators=300)
 
 model.fit(X, Y)
 
