@@ -3,10 +3,11 @@
 *.json
 *.parquet
 RAW Data/
-Session Data/
 Data Collection.xlsx
 Spotify Extended Streaming Histories
 Volunteer Data
+~$Data Collection.xlsx
+
 
 # Python
 __pycache__/
