@@ -6,9 +6,7 @@ def build_sessions(df):
     streaming_sessions = {}
     session_no = 1
 
-    print("Filtering for shuffled sessions...")
-    shuffle_sessions = df[df["shuffle"] == True].copy()
-    print("Filter completed")
+    shuffle_sessions = df.copy()
 
     shuffle_sessions["ts"] = pd.to_datetime(shuffle_sessions["ts"])
     users = shuffle_sessions['user_id'].unique().tolist()
@@ -21,7 +19,7 @@ def build_sessions(df):
             if user_shuffle_sessions.iloc[j + 1]["ts"] - user_shuffle_sessions.iloc[j]["ts"] >= timedelta(minutes=30):
                 session_no += 1
         # outside inner loop — append last row for this user
-        streaming_sessions.setdefault(session_no, []).append(user_shuffle_sessions.iloc[-1].to_dict())
+        streaming_sessions.setdefault((user_no,session_no), []).append(user_shuffle_sessions.iloc[-1].to_dict())
         session_no += 1
         user_no += 1
           # prevent bleed into next user
@@ -32,7 +30,7 @@ def build_sessions(df):
 def is_valid_session(songs):
     if len(songs) < 10:
         return False
-    if len(set(song["master_metadata_album_artist_name"] for song in songs)) == 1:
+    if len(set(song["Artist Name"] for song in songs)) == 1:
         return False
     if not any(song["reason_end"] in ("fwdbtn", "clickrow") for song in songs):
         return False
@@ -63,8 +61,34 @@ def session_compiler():
     print("Sessions Filtered")
     return Filtered_sessions, valid_sessions, song_count, agg_skip_count
 
+def feature_vectors(sessions):
+    sessions = sessions.sort_values(["session_id", "ts"]).reset_index(drop=True)
+    sessions["ts"] = pd.to_datetime(sessions["ts"])
+    sessions["hour"] = sessions["ts"].dt.hour
+    sessions["day_of_week"] = sessions["ts"].dt.dayofweek
+    sessions["skipped"] = sessions["reason_end"].isin(["fwdbtn", "clickrow"]).astype(int)
+    sessions["actively_selected"] = (sessions["reason_start"] == "clickrow").astype(int)
+
+    track_skip_rate = (
+        sessions.groupby(["user_id", "spotify_track_uri"])["skipped"]
+        .mean()
+        .rename("historical_skip_rate")
+        .reset_index()
+    )
+    sessions = sessions.merge(track_skip_rate, on=["user_id", "spotify_track_uri"], how="left")
+
+    return sessions
+
+
 def main():
     Filtered_sessions, valid_sessions, song_count, agg_skip_count = session_compiler()
+
+    print("Creating features vectors...")
+    Filtered_sessions = feature_vectors(Filtered_sessions)
+    print("Feature vectors created, writing to parquet...")
+
+    Filtered_sessions.to_parquet("../RAW Data/Filtered_Sessions.parquet", index=False)
+    print("Filtered sessions saved")
 
     print("Formatting Statistics...")
     if not Filtered_sessions.empty:
@@ -96,5 +120,4 @@ def main():
         print(f"\nNumber of songs: {song_count}")
         print(f"\nBaseline Skip Rate: {agg_skip_count / song_count * 100:.2f}%")
 
-if __name__ == "__main__":
-    main()
+

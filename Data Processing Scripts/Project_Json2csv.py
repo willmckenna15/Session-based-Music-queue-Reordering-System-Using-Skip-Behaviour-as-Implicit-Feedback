@@ -24,7 +24,12 @@ def main():
     Streaming_histories = glob.glob("../RAW Data/Streaming_history_*")
     file_no = len(Streaming_histories)
     Comb_hist = pd.concat([pd.read_csv(f) for f in Streaming_histories], ignore_index = True)
-    Comb_hist.to_csv("../RAW Data/Combined_Streaming_History.csv")
+
+    Comb_hist = Comb_hist.rename(columns={
+        "master_metadata_track_name": "Track Name",
+        "master_metadata_album_artist_name": "Artist Name"
+    })
+    Comb_hist.to_csv("../RAW Data/Combined_Streaming_History.csv", index=False)
     print(f"Streaming Histories Combined for {file_no} volunteers")
 if __name__ == "__main__":
     main()
