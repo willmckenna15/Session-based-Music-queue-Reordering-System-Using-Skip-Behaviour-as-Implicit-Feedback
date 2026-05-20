@@ -1,5 +1,5 @@
 import pandas as pd
-from openpyxl.chart import LineChart, Reference
+from openpyxl.chart import LineChart, Reference, BarChart
 from openpyxl.styles import Border, Side, Font, PatternFill
 from openpyxl.chart.legend import Legend
 from openpyxl.chart.layout import Layout, ManualLayout
@@ -19,7 +19,7 @@ df = df.rename(columns={
     "master_metadata_track_name": "Track Name",
     "master_metadata_album_artist_name": "Artist Name"
 })
-
+df['Artist Name'] =df['Artist Name'].replace('Electric Light Orchestra', 'ELO')
 df["ts"] = pd.to_datetime(df["ts"])
 df["date"] = df["ts"].dt.date
 df["time"] = df["ts"].dt.time
@@ -40,7 +40,7 @@ def Artist_Plays():
         worksheet = writer.sheets[f"{Artist} listens"]
         worksheet.sheet_state = "hidden"
 
-        chart = LineChart()
+        chart = BarChart()
         chart.title = f"Listens of {Artist} by month"
         chart.y_axis.title = "Listens"
         chart.x_axis.title = "Month"
