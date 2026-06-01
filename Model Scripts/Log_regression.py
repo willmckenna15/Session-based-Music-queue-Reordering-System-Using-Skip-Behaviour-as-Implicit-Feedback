@@ -10,7 +10,7 @@ extra_cols = ['user_id', 'spotify_track_uri']
 
 
 
-features = ['tempo','mode', 'danceability', 'energy', 'loudness','speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence','hour','day_of_week','actively_selected', 'historical_skip_rate']
+features = ['tempo','mode', 'danceability', 'energy', 'loudness','speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence','hour','day_of_week']
 
 target = 'skipped'
 
@@ -23,6 +23,7 @@ validation_df = validation_df.dropna(subset=features)
 X = training_df[features]
 Y = training_df[target]
 
+'''
 train_skip_rate = (
     training_df.groupby(["user_id", "spotify_track_uri"])["skipped"]
     .mean()
@@ -33,7 +34,7 @@ train_skip_rate = (
 validation_df = validation_df.drop(columns=["historical_skip_rate"])
 validation_df = validation_df.merge(train_skip_rate, on=["user_id", "spotify_track_uri"], how="left")
 validation_df["historical_skip_rate"] = validation_df["historical_skip_rate"].fillna(0)
-
+'''
 X_val = validation_df[features]
 Y_val = validation_df[target]
 

@@ -12,10 +12,10 @@ extra_cols = ['user_id', 'spotify_track_uri']
 
 
 
-features = ['tempo','mode', 'danceability', 'energy', 'loudness','speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence','hour','day_of_week','actively_selected', 'historical_skip_rate']
+features = ['tempo','mode', 'danceability', 'energy', 'loudness','speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence','hour','day_of_week']
 
 target = 'skipped'
-
+print("Reading Datasets...")
 training_df = pd.read_parquet(training_file, columns=features + [target] + extra_cols)
 training_df = training_df.dropna(subset=features)
 
@@ -25,6 +25,9 @@ validation_df = validation_df.dropna(subset=features)
 X = training_df[features]
 Y = training_df[target]
 
+print("Chronologising historical skip rate...")
+
+'''
 train_skip_rate = (
     training_df.groupby(["user_id", "spotify_track_uri"])["skipped"]
     .mean()
@@ -35,7 +38,7 @@ train_skip_rate = (
 validation_df = validation_df.drop(columns=["historical_skip_rate"])
 validation_df = validation_df.merge(train_skip_rate, on=["user_id", "spotify_track_uri"], how="left")
 validation_df["historical_skip_rate"] = validation_df["historical_skip_rate"].fillna(0)
-
+'''
 X_val = validation_df[features]
 Y_val = validation_df[target]
 
@@ -58,19 +61,23 @@ probs = best_model.predict_proba(X_val)[:, 1]
 auc = roc_auc_score(Y_val, probs)
 print(f"Validation AUC: {auc:.3f}")
 '''
-
+print("Training Model...")
 model = ExtraTreesClassifier(random_state = 42, min_samples_leaf=10, max_depth = 15, n_estimators=300)
 
 model.fit(X, Y)
+print("Model trained")
 
+print("Validating model...")
 probs = model.predict_proba(X_val)
 probs = probs[:, 1]
 
+print("Calculating importances...")
 importances = model.feature_importances_
 print("--- Feature Importances ---")
 for i in range(len(features)):
     print(f"{features[i]}: {importances[i]}")
 
+print("Calculating AUC-ROC score...")
 auc = roc_auc_score(Y_val, probs)
 print('AUC: %.3f' % auc)
 

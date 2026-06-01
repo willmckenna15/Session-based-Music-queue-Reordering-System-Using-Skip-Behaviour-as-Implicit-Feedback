@@ -29,6 +29,13 @@ def main():
         "master_metadata_track_name": "Track Name",
         "master_metadata_album_artist_name": "Artist Name"
     })
+
+    drop_cols = ['audiobook_title', 'audiobook_uri', 'audiobook_chapter_uri',
+             'audiobook_chapter_title', 'episode_name', 'episode_show_name',
+             'spotify_episode_uri']
+
+    Comb_hist = Comb_hist.drop(columns=[c for c in drop_cols if c in Comb_hist.columns])
+    
     Comb_hist.to_csv("../RAW Data/Combined_Streaming_History.csv", index=False)
     print(f"Streaming Histories Combined for {file_no} volunteers")
 if __name__ == "__main__":
