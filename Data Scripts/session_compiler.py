@@ -86,6 +86,7 @@ def main():
     print("Creating features vectors...")
     Filtered_sessions = feature_vectors(Filtered_sessions)
     print("Feature vectors created, writing to parquet...")
+    
 
     Filtered_sessions.to_parquet("../RAW Data/Filtered_Sessions.parquet", index=False)
     print("Filtered sessions saved")
