@@ -177,7 +177,7 @@ args = argparse.Namespace(
 )
 
 model = SASRec(feature_no=len(features), args=args).to(device)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.00007)
 criterion = nn.BCELoss()
 
 os.makedirs('../Models', exist_ok=True)
