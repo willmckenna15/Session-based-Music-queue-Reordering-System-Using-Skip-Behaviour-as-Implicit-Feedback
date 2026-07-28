@@ -3,28 +3,28 @@ from datetime import timedelta
 
 
 def build_sessions(df):
-    streaming_sessions = {}
-    session_no = 1
+    print("Constructing sessions...")
+    
+    df = df.copy()
+    df["ts"] = pd.to_datetime(df["ts"])
+    df = df.sort_values(["user_id", "ts"]).reset_index(drop=True)
 
-    shuffle_sessions = df.copy()
+    df["time_gap"] = df.groupby("user_id")["ts"].diff()
 
-    shuffle_sessions["ts"] = pd.to_datetime(shuffle_sessions["ts"])
-    users = shuffle_sessions['user_id'].unique().tolist()
-    user_no = 1
-    for user in users:
-        print(f"Constructing sessions for volunteer {user_no}..")
-        user_shuffle_sessions = shuffle_sessions[shuffle_sessions["user_id"] == user].sort_values(["ts"],).reset_index(drop=True)
-        for j in range(len(user_shuffle_sessions) - 1):
-            streaming_sessions.setdefault(session_no, []).append(user_shuffle_sessions.iloc[j].to_dict())
-            if user_shuffle_sessions.iloc[j + 1]["ts"] - user_shuffle_sessions.iloc[j]["ts"] >= timedelta(minutes=30):
-                session_no += 1
-        # outside inner loop — append last row for this user
-        streaming_sessions.setdefault((user_no,session_no), []).append(user_shuffle_sessions.iloc[-1].to_dict())
-        session_no += 1
-        user_no += 1
-          # prevent bleed into next user
+    new_session = (
+        (df["time_gap"] > pd.Timedelta(minutes=30)) |
+        (df["user_id"] != df["user_id"].shift(1))
+    )
+
+    df["session_id"] = new_session.cumsum()
+    df = df.drop(columns=["time_gap"])
+
+    streaming_sessions = {
+        session_id: group.to_dict('records')
+        for session_id, group in df.groupby("session_id")
+    }
+
     print("All Sessions Constructed")
-
     return streaming_sessions
 
 def is_valid_session(songs):
@@ -69,15 +69,45 @@ def feature_vectors(sessions):
     sessions["skipped"] = sessions["reason_end"].isin(["fwdbtn", "clickrow"]).astype(int)
     sessions["actively_selected"] = (sessions["reason_start"] == "clickrow").astype(int)
 
-    track_skip_rate = (
-        sessions.groupby(["user_id", "spotify_track_uri"])["skipped"]
-        .mean()
-        .rename("historical_skip_rate")
-        .reset_index()
-    )
-    sessions = sessions.merge(track_skip_rate, on=["user_id", "spotify_track_uri"], how="left")
-
     return sessions
+
+def historical_skip_rate(df):
+
+    df = df.sort_values(['user_id', 'spotify_track_uri', 'session_id'])
+    
+
+    grouped = df.groupby(['user_id', 'spotify_track_uri'])['skipped']
+    
+    cumulative_skips = grouped.transform(lambda x: x.shift(1).expanding().sum())
+    cumulative_plays = grouped.transform(lambda x: x.shift(1).expanding().count())
+    
+    df['historical_skip_rate'] = (cumulative_skips / cumulative_plays).fillna(0.0)
+    
+    df = df.sort_values(['user_id', 'session_id', 'ts'])
+
+    return df
+
+def song_position(df):
+    df = df.sort_values(['session_id', 'ts'])
+    df['song_pos'] = df.groupby('session_id').cumcount()
+    return df
+
+def add_track_length(df):
+    completed = df[df['reason_end'] == 'trackdone'].groupby('spotify_track_uri')['ms_played'].max()
+    
+    all_max = df.groupby('spotify_track_uri')['ms_played'].max()
+    
+    track_lengths = all_max.copy()
+    track_lengths = track_lengths.clip(lower=240000) #4 minutes
+    track_lengths.update(completed)
+    df['track_length'] = df['spotify_track_uri'].map(track_lengths)
+    df['ms_played'] = df[['ms_played', 'track_length']].min(axis=1)
+    df = df[df['track_length'] > 0]
+    return df
+        
+
+        
+
 
 
 def main():
@@ -85,8 +115,11 @@ def main():
 
     print("Creating features vectors...")
     Filtered_sessions = feature_vectors(Filtered_sessions)
-    print("Feature vectors created, writing to parquet...")
-    
+    Filtered_sessions = historical_skip_rate(Filtered_sessions)
+    Filtered_sessions = song_position(Filtered_sessions)
+    Filtered_sessions = add_track_length(Filtered_sessions)
+    print("Writing to parquet...")
+    print(Filtered_sessions.head(5))
 
     Filtered_sessions.to_parquet("../RAW Data/Filtered_Sessions.parquet", index=False)
     print("Filtered sessions saved")
