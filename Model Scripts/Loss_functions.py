@@ -51,7 +51,7 @@ class PWTSLoss(nn.Module):
         position_weight = 1 + torch.exp(-percentage_pos * 3)
         linear_part = 2 - (2 - 1.0) * (percentage_listen / 0.1)
         time_weight = torch.where(
-            percentage_listen <= 0.05,
+            percentage_listen <= 0.1,
             torch.clamp(linear_part, min=1.0),
             torch.tensor(1.0, device=percentage_listen.device))
         historical_weight = 1 + torch.sigmoid((historical_skip_rate - 0.5) * 6)

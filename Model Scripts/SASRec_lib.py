@@ -153,7 +153,7 @@ class SASRec(torch.nn.Module):
         skip_probs = self.sigmoid(self.output_layer(feats)).squeeze(-1)
         return skip_probs
 
-def log_ablation(best_auc, experiment_name, config_description):
+def log_test(best_auc, experiment_name, config_description):
     log_path = '../Models/test_log.csv'
     entry = pd.DataFrame([{
         'experiment': experiment_name,
@@ -163,7 +163,7 @@ def log_ablation(best_auc, experiment_name, config_description):
     }])
     if os.path.exists(log_path):
         existing = pd.read_csv(log_path)
-        combined = pd.concat([existing, entry], ignore_index=True)
+        combined = pd.concat([existing.sort_values("val_auc", ascending=False), entry], ignore_index=True)
     else:
         combined = entry
     combined.to_csv(log_path, index=False)
