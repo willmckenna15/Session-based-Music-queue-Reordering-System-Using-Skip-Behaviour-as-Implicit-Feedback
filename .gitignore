@@ -1,5 +1,4 @@
 # Data
-*.csv
 *.json
 *.parquet
 RAW Data/
