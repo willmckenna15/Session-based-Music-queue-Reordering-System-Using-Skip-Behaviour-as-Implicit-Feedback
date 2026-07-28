@@ -1,15 +1,15 @@
 experiment,config,val_auc,timestamp
-pwts,"linear ste 2, threshold = 0.5, max_weight = 3",0.7732,08:22.8
-pwts,"linear ste 0, threshold = 0.5, max_weight = 3",0.7768,43:56.5
-pwts,"linear step 1, threshold = 0.5, max_weight = 3",0.7754,2026-07-28 11:18:33.583261
-pwts,"linear step 1, threshold = 0.5, max_weight = 4",0.777,2026-07-28 11:56:58.332868
-pwts,"linear step 0, threshold = 0.5, max_weight = 4",0.7729,2026-07-28 12:33:31.732063
-pwts,"linear step 2, threshold = 0.5, max_weight = 4",0.7749,2026-07-28 13:01:10.914920
-pwts,"linear step 0, threshold = 0.5, max_weight = 10",0.7638,2026-07-28 13:36:08.551421
-pwts,"linear step 0, threshold = 0.5, max_weight = 7",0.77,2026-07-28 14:59:33.777541
-pwts,"linear step 0, threshold = 0.5, max_weight = 2",0.7742,2026-07-28 15:48:49.307463
-pwts,"linear step 1, threshold = 0.5, max_weight = 2",0.7757,2026-07-28 17:03:17.850980
-pwts,"linear step 2, threshold = 0.5, max_weight = 2",0.7717,2026-07-28 20:10:56.114827
-pwts,"linear step 0, threshold = 0.1, max_weight = 2",0.778,2026-07-28 20:35:56.571457
-pwts,"linear step 1, threshold = 0.1, max_weight = 2",0.7725,2026-07-28 21:42:51.895339
-pwts,"linear step 2, threshold = 0.1, max_weight = 2",0.7771,2026-07-28 22:05:11.513502
+pwts,"linear step 0, threshold = 0.1, max_weight = 2",0.7785,23:32:51
+pwts,"linear step 1, threshold = 0.1, max_weight = 2",0.7778,2026-07-28 23:57:27.222577
+pwts,"linear step 1, threshold = 0.5, max_weight = 4",0.777,11:56:58
+pwts,"linear ste 0, threshold = 0.5, max_weight = 3",0.7768,00:43:57
+pwts,"linear step 1, threshold = 0.5, max_weight = 2",0.7757,17:03:18
+pwts,"linear step 1, threshold = 0.5, max_weight = 3",0.7754,11:18:34
+pwts,"linear step 2, threshold = 0.5, max_weight = 4",0.7749,13:01:11
+pwts,"linear step 0, threshold = 0.5, max_weight = 2",0.7742,15:48:49
+pwts,"linear ste 2, threshold = 0.5, max_weight = 3",0.7732,00:08:23
+pwts,"linear step 0, threshold = 0.5, max_weight = 4",0.7729,12:33:32
+pwts,"linear step 2, threshold = 0.5, max_weight = 2",0.7717,20:10:56
+pwts,"linear step 0, threshold = 0.5, max_weight = 7",0.77,14:59:34
+pwts,"linear step 0, threshold = 0.5, max_weight = 10",0.7638,13:36:09
+pwts,"linear step 2, threshold = 0.1, max_weight = 2",0.7769,2026-07-29 00:19:19.590639
