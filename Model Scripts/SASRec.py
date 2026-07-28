@@ -1,4 +1,4 @@
-from SASRec_lib import SessionDataset, collate_fn, SASRec, train_epoch, evaluate_sequential, log_ablation
+from SASRec_lib import SessionDataset, collate_fn, SASRec, train_epoch, evaluate_sequential, log_test
 import torch
 import pandas as pd
 import torch.nn as nn
@@ -21,8 +21,6 @@ args = parse_args()
 loss_name = args.loss
 
 
-# ── Load Best Params ──────────────────────────────────────────────────────────
-
 params_path = f'../Models/sasrec_{loss_name}_best_params.json'
 if not os.path.exists(params_path):
     raise FileNotFoundError(f"Best params not found for {loss_name}. Run sasrec_tuning.py --loss {loss_name} first.")
@@ -32,7 +30,6 @@ with open(params_path, 'r') as f:
 
 print(f"Loaded best params: {best_params}")
 
-# ── Load Data ─────────────────────────────────────────────────────────────────
 
 print("Loading datasets...")
 train_dataset = SessionDataset('../RAW Data/training_data.parquet', features, target)
@@ -44,7 +41,6 @@ val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, collate_fn=co
 
 os.makedirs('../Models', exist_ok=True)
 
-# ── Build Model ───────────────────────────────────────────────────────────────
 
 args_mod = argparse.Namespace(
     device=device,
@@ -74,8 +70,6 @@ optimizer = torch.optim.Adam(
 
 print(f"\nTraining SASRec with best {loss_name.upper()} hyperparameters...\n")
 
-# ── Training Loop ─────────────────────────────────────────────────────────────
-
 best_auc = 0
 patience_counter = 0
 max_epochs = 100
@@ -98,7 +92,7 @@ for epoch in range(max_epochs):
 
 
 if args.experiment != 'unnamed':
-    log_ablation(
+    log_test(
         best_auc,
         experiment_name=loss_name,
         config_description=args.experiment

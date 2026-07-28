@@ -39,7 +39,7 @@ def handle_interrupt(sig, frame):
         sys.stdout.write("Invalid choice, resuming run...\n")
         sys.stdout.flush()
 
-# ── Dataset ───────────────────────────────────────────────────────────────────
+##Dataset
 
 class SessionDataset(Dataset):
     def __init__(self, parquet_path, features, target):
@@ -83,8 +83,7 @@ def collate_fn(batch):
     lengths = torch.tensor([len(s) for s in sessions])
     return sessions_padded, labels_padded,song_pos_padded, ms_played_padded, track_length_padded,historical_skip_rate_padded, lengths
 
-
-# ── Model ─────────────────────────────────────────────────────────────────────
+##Model
 
 class PointWiseFeedForward(torch.nn.Module):
     def __init__(self, hidden_units, dropout_rate):
@@ -155,7 +154,7 @@ class SASRec(torch.nn.Module):
         return skip_probs
 
 def log_ablation(best_auc, experiment_name, config_description):
-    log_path = '../Models/ablation_log.csv'
+    log_path = '../Models/test_log.csv'
     entry = pd.DataFrame([{
         'experiment': experiment_name,
         'config': config_description,
@@ -169,7 +168,7 @@ def log_ablation(best_auc, experiment_name, config_description):
         combined = entry
     combined.to_csv(log_path, index=False)
 
-# ── Training ──────────────────────────────────────────────────────────────────
+##Training
 
 def train_epoch(model, loader, optimizer, criterion, device, loss_name='bce'):
     model.train()
