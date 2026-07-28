@@ -36,7 +36,8 @@ target = 'skipped'
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
-loss_name = parse_loss_arg()
+args = parse_args()
+loss_name = args.loss
 
 print("Loading datasets...")
 train_dataset = SessionDataset('../RAW Data/training_data.parquet', features, target)
@@ -45,7 +46,7 @@ print(f"Train sessions: {len(train_dataset)} | Val sessions: {len(val_dataset)}"
 
 os.makedirs('../Models', exist_ok=True)
 
-# ── Grid Search ───────────────────────────────────────────────────────────────
+##Grid search
 
 param_grid = {
     'hidden_units': [64, 128, 256],
@@ -98,7 +99,7 @@ for combo in combinations:
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, collate_fn=collate_fn)
     val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, collate_fn=collate_fn)
 
-    args = argparse.Namespace(
+    args_mod = argparse.Namespace(
         device=device,
         hidden_units=params['hidden_units'],
         maxlen=200,
@@ -108,7 +109,7 @@ for combo in combinations:
         norm_first=True
     )
 
-    model = SASRec(feature_no=len(features), args=args).to(device)
+    model = SASRec(feature_no=len(features), args=args_mod).to(device)
 
     if loss_name == "drrl":
         criterion = DrRLLoss(gamma=params["gamma"])
@@ -153,7 +154,7 @@ for combo in combinations:
     combinations_completed += 1
     print(f'\n{combinations_completed+len(completed_params)} combinations completed out of {len(combinations)}\n')
 
-# ── Summary ───────────────────────────────────────────────────────────────────
+##Summary
 
 results_df = pd.DataFrame(results).sort_values('val_auc', ascending=False)
 print("\n--- Grid Search Results ---")

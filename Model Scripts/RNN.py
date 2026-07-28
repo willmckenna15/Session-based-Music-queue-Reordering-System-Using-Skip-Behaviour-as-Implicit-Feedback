@@ -7,8 +7,6 @@ from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
 import os
 
-# ── Dataset ───────────────────────────────────────────────────────────────────
-
 class SessionDataset(Dataset):
     def __init__(self, parquet_path, features, target):
         df = pd.read_parquet(parquet_path)
@@ -39,8 +37,6 @@ def collate_fn(batch):
     return sessions_padded, labels_padded, lengths
 
 
-# ── Model ─────────────────────────────────────────────────────────────────────
-
 class SkipLSTM(nn.Module):
     def __init__(self, input_size, hidden_size=64, num_layers=2, dropout=0.3):
         super(SkipLSTM, self).__init__()
@@ -62,9 +58,6 @@ class SkipLSTM(nn.Module):
         output, _ = nn.utils.rnn.pad_packed_sequence(packed_out, batch_first=True)
         out = self.sigmoid(self.fc(output)).squeeze(-1)
         return out
-
-
-# ── Training ──────────────────────────────────────────────────────────────────
 
 def train_epoch(model, loader, optimizer, criterion, device):
     model.train()
@@ -121,9 +114,6 @@ def evaluate_sequential(model, loader, device, min_context=5, min_skips_in_conte
                 all_labels.extend(labels[i, context_len:length].numpy())
 
     return roc_auc_score(all_labels, all_preds)
-
-
-# ── Main ──────────────────────────────────────────────────────────────────────
 
 features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
             'acousticness', 'instrumentalness', 'liveness', 'valence',

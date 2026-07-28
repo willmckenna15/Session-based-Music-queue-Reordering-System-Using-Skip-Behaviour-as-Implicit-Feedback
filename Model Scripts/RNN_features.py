@@ -94,8 +94,6 @@ def permutation_importance(model, loader, device, features, baseline_auc):
         importances[feat_name] = baseline_auc - shuffled_auc
     return dict(sorted(importances.items(), key=lambda x: x[1], reverse=True))
 
-# ── Main ──────────────────────────────────────────────────────────────────────
-
 features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
             'acousticness', 'instrumentalness', 'liveness', 'valence',
             'hour', 'day_of_week']
