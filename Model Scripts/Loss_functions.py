@@ -49,11 +49,14 @@ class PWTSLoss(nn.Module):
         percentage_pos = song_pos / torch.clamp(lengths, min=1e-8)
 
         position_weight = 1 + torch.exp(-percentage_pos * 3)
-        linear_part = 2 - (2 - 1.0) * (percentage_listen / 0.1)
+        time_weight = 1 + torch.exp(-percentage_listen * 30)
+        '''
+        linear_part = 2 - (2 - 1.0) * (percentage_listen / 0.15)
         time_weight = torch.where(
-            percentage_listen <= 0.1,
+            percentage_listen <= 0.15,
             torch.clamp(linear_part, min=1.0),
             torch.tensor(1.0, device=percentage_listen.device))
+        '''
         historical_weight = 1 + torch.sigmoid((historical_skip_rate - 0.5) * 6)
 
         combined_weight = position_weight * time_weight * historical_weight

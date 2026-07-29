@@ -1,15 +1,10 @@
-experiment,config,val_auc,timestamp
-pwts,"linear step 0, threshold = 0.1, max_weight = 2",0.7785,23:32:51
-pwts,"linear step 1, threshold = 0.1, max_weight = 2",0.7778,2026-07-28 23:57:27.222577
-pwts,"linear step 1, threshold = 0.5, max_weight = 4",0.777,11:56:58
-pwts,"linear ste 0, threshold = 0.5, max_weight = 3",0.7768,00:43:57
-pwts,"linear step 1, threshold = 0.5, max_weight = 2",0.7757,17:03:18
-pwts,"linear step 1, threshold = 0.5, max_weight = 3",0.7754,11:18:34
-pwts,"linear step 2, threshold = 0.5, max_weight = 4",0.7749,13:01:11
-pwts,"linear step 0, threshold = 0.5, max_weight = 2",0.7742,15:48:49
-pwts,"linear ste 2, threshold = 0.5, max_weight = 3",0.7732,00:08:23
-pwts,"linear step 0, threshold = 0.5, max_weight = 4",0.7729,12:33:32
-pwts,"linear step 2, threshold = 0.5, max_weight = 2",0.7717,20:10:56
-pwts,"linear step 0, threshold = 0.5, max_weight = 7",0.77,14:59:34
-pwts,"linear step 0, threshold = 0.5, max_weight = 10",0.7638,13:36:09
-pwts,"linear step 2, threshold = 0.1, max_weight = 2",0.7769,2026-07-29 00:19:19.590639
+experiment,config,val_auc,std_auc,timestamp
+pwts,"time weight, stepwise, threshold = 0.1, max_weight = 2",0.777733333,0.000802081,
+pwts,No Time Weight,0.7758,0.0015,
+pwts,"time weight, stepwise, threshold = 0.05, max_weight = 3",0.775133333,0.001814754,
+pwts,"time weight, stepwise, threshold = 0.05, max_weight = 4",0.774933333,0.002050203,
+pwts,"time weight, exponential, exponent = 5",0.7749,0.0011,13:53.0
+pwts,"time weight, exponential, exponent = 10",0.7749,0.0011,2026-07-29 15:05:05.700426
+pwts,"time weight, stepwise, threshold = 0.1, max_weight = 3",0.774266667,0.001715615,
+pwts,"time weight, stepwise, threshold = 0.05, max_weight = 2",0.773866667,0.002020726,
+pwts,"time weight, stepwise, threshold = 0.15, max_weight = 2",0.7701,,
