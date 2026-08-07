@@ -1,20 +1,32 @@
-from Model_lib import (SessionDataset, collate_fn, SASRec, train_epoch,
-                       evaluate_sequential_tuning, LengthBucketSampler)
 import torch
+from torch.utils.data import DataLoader, Subset
 import pandas as pd
 import numpy as np
-import torch.nn as nn
-from torch.utils.data import DataLoader, Subset
+import random
 from tqdm import tqdm
 import os
 import sys
-import argparse
 import itertools
 import signal
+from Model_lib import (SessionDataset, train_epoch, evaluate_sequential_tuning, SkipLSTM,
+                       collate_fn, LengthBucketSampler)
 from Loss_functions import get_loss_criterion, parse_args, DrRLLoss, PWTSLoss
+
+features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
+            'acousticness', 'instrumentalness', 'liveness', 'valence',
+            'historical_skip_rate',
+            'historical_artist_skip_rate', 'shuffle', 'is_repeat_track', 'same_artist_as_prev']
+target = 'skipped'
+
+args = parse_args()
+loss_name = args.loss
+
+SEED = 0
 
 # Set by SLURM inside a job array; -1 means an ordinary serial run
 TASK_ID = int(os.environ.get('SLURM_ARRAY_TASK_ID', -1))
+
+completed_csv = f'../Models/LSTM_grid_search_{loss_name}_results.csv'
 
 
 def handle_interrupt(sig, frame):
@@ -35,30 +47,28 @@ def handle_interrupt(sig, frame):
     else:
         print("Invalid choice, resuming run...")
 
+
 # input() raises EOFError in a batch job with no stdin, which would kill the run
 if sys.stdin.isatty():
     signal.signal(signal.SIGINT, handle_interrupt)
 
-features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
-            'acousticness', 'instrumentalness', 'liveness', 'valence',
-            'historical_skip_rate',
-            'historical_artist_skip_rate', 'shuffle', 'is_repeat_track', 'same_artist_as_prev']
-target = 'skipped'
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+elif torch.backends.mps.is_available():
+    device = torch.device("mps")
+else:
+    device = torch.device("cpu")
 print(f"Using device: {device}")
-
-args = parse_args()
-loss_name = args.loss
 
 print("Loading datasets...")
 train_dataset = SessionDataset('../RAW Data/training_data.parquet', features, target)
 val_dataset = SessionDataset('../RAW Data/validation_data.parquet', features, target)
 print(f"Train sessions: {len(train_dataset)} | Val sessions: {len(val_dataset)}")
 
-# Evaluate in length-sorted order so batches stop padding to their longest session.
-# Measured 1.15x here at hidden_units=64/num_heads=4; the score is unchanged, since
-# evaluate_sequential averages within each session before averaging across sessions.
+# Evaluate in length-sorted order. Batches pad to their own longest session, and
+# validation lengths span 7 to 786, so most of the forward pass is padding - sorting
+# removes ~2.6x of it. The score is unchanged: evaluate_sequential averages within
+# each session before averaging across sessions, so batch composition is irrelevant.
 val_order = np.argsort([len(y) for y in val_dataset.labels]).tolist()
 val_eval_dataset = Subset(val_dataset, val_order)
 
@@ -69,17 +79,17 @@ os.makedirs('../Models', exist_ok=True)
 
 ##Grid search
 
+# num_blocks/num_heads are attention concepts with no LSTM equivalent; depth is
+# num_layers instead, so the grid is 54 combinations rather than SASRec's 162.
 param_grid = {
     'hidden_units': [64, 128, 256],
     'dropout_rate': [0.1, 0.3, 0.5],
-    'num_blocks':   [1, 2, 3],
-    'num_heads':    [4, 8, 16],
+    'num_layers':   [1, 2, 3],
     'lr':           [0.001, 0.0001],
 }
 
 if loss_name == "drrl":
-    param_grid["gamma"]= [2,3,4]
-
+    param_grid["gamma"] = [2, 3, 4]
 
 lr_to_epochs = {
     0.001:   20,
@@ -87,13 +97,8 @@ lr_to_epochs = {
 }
 
 keys = list(param_grid.keys())
-combinations = [
-    combo for combo in itertools.product(*param_grid.values())
-    if dict(zip(keys, combo))['hidden_units'] % dict(zip(keys, combo))['num_heads'] == 0
-]
+combinations = list(itertools.product(*param_grid.values()))
 print(f"\nRunning grid search over {len(combinations)} combinations...\n")
-
-completed_csv = f'../Models/sasrec_grid_search_{loss_name}_results.csv'
 
 # Inside a job array each task owns one config and its own results file - a shared
 # CSV would be clobbered by concurrent writes, and the resume logic below would
@@ -103,7 +108,7 @@ if TASK_ID >= 0:
         print(f"Task {TASK_ID} exceeds {len(combinations)} combinations - nothing to do.")
         sys.exit(0)
     combinations = [combinations[TASK_ID]]
-    completed_csv = f'../Models/sasrec_grid_{loss_name}_task{TASK_ID}.csv'
+    completed_csv = f'../Models/LSTM_grid_{loss_name}_task{TASK_ID}.csv'
     print(f"SLURM array task {TASK_ID}: 1 config -> {completed_csv}")
 
 if os.path.exists(completed_csv):
@@ -133,6 +138,12 @@ for combo in combinations:
 
     max_epochs = lr_to_epochs[params['lr']]
 
+    # Seed before anything stochastic is constructed - weight init, DataLoader
+    # shuffle, dropout masks and the per-epoch boundary draw all read global RNG
+    torch.manual_seed(SEED)
+    np.random.seed(SEED)
+    random.seed(SEED)
+
     # Length-bucketed batches: 6.2x less padded compute than random batching, with
     # batch order reshuffled each epoch so training stays stochastic
     train_loader = DataLoader(train_dataset, collate_fn=collate_fn,
@@ -140,32 +151,26 @@ for combo in combinations:
     val_loader = DataLoader(val_eval_dataset, batch_size=BATCH_SIZE, shuffle=False,
                             collate_fn=collate_fn)
 
-    args_mod = argparse.Namespace(
-        device=device,
-        hidden_units=params['hidden_units'],
-        maxlen=200,
-        dropout_rate=params['dropout_rate'],
-        num_blocks=params['num_blocks'],
-        num_heads=params['num_heads'],
-        norm_first=True
-    )
-
-    model = SASRec(feature_no=len(features), args=args_mod).to(device)
+    model = SkipLSTM(
+        input_size=len(features),
+        hidden_size=params['hidden_units'],
+        num_layers=params['num_layers'],
+        dropout=params['dropout_rate'],
+    ).to(device)
 
     if loss_name == "drrl":
         criterion = DrRLLoss(gamma=params["gamma"])
     elif loss_name == "pwts":
-        criterion = PWTSLoss()   
-    else: 
+        criterion = PWTSLoss()
+    else:
         criterion = get_loss_criterion(loss_name)
-    
+
     criterion = criterion.to(device)
-        
+
     optimizer = torch.optim.Adam(
-        list(model.parameters())+list(criterion.parameters()),
+        list(model.parameters()) + list(criterion.parameters()),
         lr=params['lr']
     )
-
 
     history = []
     best_smoothed = -np.inf
@@ -197,7 +202,7 @@ for combo in combinations:
           f"of {epochs_run} run")
     results.append({**params, 'val_ndcg': best_smoothed, 'val_ndcg_raw': best_raw,
                     'best_epoch': best_epoch, 'epochs_run': epochs_run,
-                    'max_epochs': max_epochs})
+                    'max_epochs': max_epochs, 'seed': SEED})
 
     pd.DataFrame(results).sort_values('val_ndcg', ascending=False).to_csv(
         completed_csv, index=False
@@ -211,16 +216,18 @@ results_df = pd.DataFrame(results).sort_values('val_ndcg', ascending=False)
 print("\n--- Grid Search Results ---")
 print(results_df.to_string(index=False))
 
-best_params = results_df.iloc[0].to_dict()
-print(f"\nBest config: {best_params}")
+if results_df.empty:
+    print("\nNo results - every combination was already complete.")
+else:
+    best_params = results_df.iloc[0].to_dict()
+    print(f"\nBest config: {best_params}")
+    # If best_epoch sits close to epochs_run, patience is cutting runs off while they
+    # are still improving; if epochs_run hits max_epochs, the cap is binding.
+    if 'epochs_run' in results_df:
+        at_cap = int((results_df.epochs_run >= results_df.max_epochs).sum())
+        still_climbing = int((results_df.best_epoch >= results_df.epochs_run - 1).sum())
+        print(f'{at_cap} of {len(results_df)} configs reached max_epochs')
+        print(f'{still_climbing} of {len(results_df)} were still improving when stopped')
 
-# If best_epoch sits close to epochs_run, patience is cutting runs off while they are
-# still improving; if epochs_run hits max_epochs, the cap is the binding constraint.
-if 'epochs_run' in results_df:
-    at_cap = int((results_df.epochs_run >= results_df.max_epochs).sum())
-    still_climbing = int((results_df.best_epoch >= results_df.epochs_run - 1).sum())
-    print(f'{at_cap} of {len(results_df)} configs reached max_epochs')
-    print(f'{still_climbing} of {len(results_df)} were still improving when stopped')
-
-pd.Series(best_params).to_json(f'../Models/sasrec_{loss_name}_best_params.json')
-print(f"Best params saved to ../Models/sasrec_{loss_name}_best_params.json")
+    pd.Series(best_params).to_json(f'../Models/lstm_{loss_name}_best_params.json')
+    print(f"Best params saved to ../Models/lstm_{loss_name}_best_params.json")

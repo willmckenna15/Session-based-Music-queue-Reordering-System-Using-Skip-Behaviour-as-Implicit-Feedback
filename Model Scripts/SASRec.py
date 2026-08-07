@@ -1,4 +1,4 @@
-from SASRec_lib import SessionDataset, collate_fn, SASRec, train_epoch, evaluate_sequential, log_test
+from Model_lib import SessionDataset, collate_fn, SASRec, train_epoch, evaluate_sequential, log_test
 import torch
 import numpy as np
 import random
@@ -13,10 +13,16 @@ from Loss_functions import get_loss_criterion, parse_args, DrRLLoss, PWTSLoss
 
 features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
             'acousticness', 'instrumentalness', 'liveness', 'valence',
-            'hour', 'day_of_week', 'actively_selected']
+            'historical_skip_rate',
+            'historical_artist_skip_rate', 'shuffle', 'is_repeat_track', 'same_artist_as_prev']
 target = 'skipped'
 
-device = torch.device("mps" if torch.mps.is_available() else "cpu")
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+elif torch.backends.mps.is_available():
+    device = torch.device("mps")
+else:
+    device = torch.device("cpu")
 print(f"Using device: {device}")
 
 args = parse_args()
@@ -79,7 +85,7 @@ def run_training(seed=None, verbose=True):
 
     for epoch in range(100):
         train_loss = train_epoch(model, train_loader, optimizer, criterion, device, loss_name=loss_name)
-        val_auc = evaluate_sequential(model, val_loader, device)
+        val_auc, _ = evaluate_sequential(model, val_loader, device)
 
         if verbose:
             tqdm.write(f"Epoch {epoch+1} | Loss: {train_loss:.4f} | Val AUC: {val_auc:.4f}")

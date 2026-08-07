@@ -1,24 +1,32 @@
 import pandas as pd
+import numpy as np
 from sklearn.metrics import roc_curve, roc_auc_score
 from matplotlib import pyplot
 from sklearn.linear_model import LogisticRegression
+# same metric definitions the sequence models are scored on, so the numbers compare
+from Model_lib import ndcg_at_k, valid_splits, pick, fast_auc
 
 training_file = '../RAW Data/training_data.parquet'
 validation_file = '../RAW Data/validation_data.parquet'
 
-extra_cols = ['user_id', 'spotify_track_uri']
+extra_cols = ['user_id', 'spotify_track_uri', 'session_id', 'ts']
 
 
 
-features = ['tempo','mode', 'danceability', 'energy', 'loudness','speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence','hour','day_of_week']
-
+# actively_selected removed: it is not knowable for an unplayed queue track, so it
+# cannot be deployed. Same 17 features as SASRec/SkipLSTM/ExtraTrees.
+features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
+            'acousticness', 'instrumentalness', 'liveness', 'valence',
+            'historical_skip_rate',
+            'historical_artist_skip_rate', 'shuffle', 'is_repeat_track', 'same_artist_as_prev']
 target = 'skipped'
 
 training_df = pd.read_parquet(training_file, columns=features + [target] + extra_cols)
 training_df = training_df.dropna(subset=features)
 
 validation_df = pd.read_parquet(validation_file, columns=features + [target] + extra_cols)
-validation_df = validation_df.dropna(subset=features)
+# reset_index so row positions line up with predict_proba output
+validation_df = validation_df.dropna(subset=features).reset_index(drop=True)
 
 X = training_df[features]
 Y = training_df[target]
@@ -46,7 +54,23 @@ probs = model.predict_proba(X_val)
 probs = probs[:, 1]
 
 auc = roc_auc_score(Y_val, probs)
-print('AUC: %.3f' % auc)
+print('Pooled AUC: %.4f' % auc)
+
+# Per-session scoring - the protocol Model_lib.evaluate_sequential uses, so these
+# numbers sit in the same table as SASRec/SkipLSTM. Pooled AUC is a different
+# quantity and the two are not interchangeable.
+session_aucs, session_ndcgs = [], []
+for _, g in validation_df.sort_values('ts').groupby('session_id', sort=False):
+    y, p = g[target].to_numpy(), probs[g.index.to_numpy()]
+    splits = valid_splits(y, len(y))
+    if not splits:
+        continue
+    chosen = pick(splits)
+    session_aucs.append(np.mean([fast_auc(y[c:], p[c:]) for c in chosen]))
+    session_ndcgs.append(np.mean([ndcg_at_k(y[c:], p[c:]) for c in chosen]))
+
+print(f'Per-session AUC:    {np.mean(session_aucs):.4f}')
+print(f'Per-session NDCG@5: {np.mean(session_ndcgs):.4f} across {len(session_aucs)} sessions')
 
 '''
 fpr, tpr, thresholds = roc_curve(Y_val, probs)

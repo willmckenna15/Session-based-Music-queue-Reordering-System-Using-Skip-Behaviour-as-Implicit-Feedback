@@ -95,8 +95,7 @@ def permutation_importance(model, loader, device, features, baseline_auc):
     return dict(sorted(importances.items(), key=lambda x: x[1], reverse=True))
 
 features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
-            'acousticness', 'instrumentalness', 'liveness', 'valence',
-            'hour', 'day_of_week']
+            'acousticness', 'instrumentalness', 'liveness', 'valence']
 target = 'skipped'
 
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")

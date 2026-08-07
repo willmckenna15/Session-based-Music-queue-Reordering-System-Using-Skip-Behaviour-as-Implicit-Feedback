@@ -4,6 +4,14 @@ import argparse
 
 
 class DrRLLoss(nn.Module):
+    """Distributionally robust ranking loss (Renyi divergence over negatives).
+
+    Consumes LOGITS. The method is derived over unbounded ranking scores; applied to
+    sigmoid outputs confined to [0,1] the objective saturates and gradients vanish as
+    the model grows confident, which characterises the implementation rather than the
+    loss.
+    """
+
     def __init__(self, gamma=2.0, eta=0.1, eps=1e-1):
         super(DrRLLoss, self).__init__()
         self.gamma = gamma
@@ -26,6 +34,11 @@ class DrRLLoss(nn.Module):
         self.beta_optimizer.zero_grad()
         loss_beta.backward()
         self.beta_optimizer.step()
+        # beta is an nn.Parameter, so it is also handed to the main Adam optimiser via
+        # criterion.parameters(). Without this, the gradient left here is picked up by
+        # the following optimizer.step() and beta is stepped a second time, at Adam's
+        # learning rate - measured at ~166x the intended SGD step.
+        self.beta.grad = None
 
     def forward(self, preds, skip):
         pos_scores = preds[skip == 1]
@@ -40,33 +53,32 @@ class DrRLLoss(nn.Module):
         return -pos_scores.mean() + renyi_penalty
 
 class PWTSLoss(nn.Module):
+    """Position/time weighted BCE. Consumes LOGITS."""
+
     def __init__(self):
         super(PWTSLoss, self).__init__()
-        self.bce = nn.BCELoss(reduction='none')
+        self.bce = nn.BCEWithLogitsLoss(reduction='none')
 
     def forward(self, preds, labels, song_pos, lengths, ms_played, track_length, historical_skip_rate):
         percentage_listen = ms_played / torch.clamp(track_length, min=1e-8)
         percentage_pos = song_pos / torch.clamp(lengths, min=1e-8)
-
         position_weight = 1 + torch.exp(-percentage_pos * 3)
-        time_weight = 1 + torch.exp(-percentage_listen * 30)
-        '''
-        linear_part = 2 - (2 - 1.0) * (percentage_listen / 0.15)
+        linear_part = 2 - (2 - 1.0) * (percentage_listen / 0.1)
         time_weight = torch.where(
-            percentage_listen <= 0.15,
+            percentage_listen <= 0.1,
             torch.clamp(linear_part, min=1.0),
             torch.tensor(1.0, device=percentage_listen.device))
-        '''
         historical_weight = 1 + torch.sigmoid((historical_skip_rate - 0.5) * 6)
 
-        combined_weight = position_weight * time_weight * historical_weight
+        combined_weight = time_weight * historical_weight * position_weight
         combined_weight = combined_weight/combined_weight.mean()
         per_sample_loss = self.bce(preds, labels)
         return (combined_weight * per_sample_loss).mean()
 
 def get_loss_criterion(loss_name, gamma=2.0, eta=0.1, active_scalar = 2.0):
     if loss_name == 'bce':
-        return nn.BCELoss()
+        # WithLogits: the models emit logits, and this is the stable log-sum-exp form
+        return nn.BCEWithLogitsLoss()
     elif loss_name == 'drrl':
         return DrRLLoss(gamma=gamma, eta=eta)
     elif loss_name == 'pwts':

@@ -1,10 +1,22 @@
+import numpy as np
 import pandas as pd
 
 
 def main():
-    INPUT = '../RAW Data/Combined_Streaming_History.parquet'
+    INPUT = '../RAW Data/Filtered_Sessions.parquet'
 
     sessions = pd.read_parquet(INPUT)
+
+    print("Normalising Dataset (per user)")
+    cols_to_normalise = ['danceability', 'energy', 'speechiness', 'acousticness',
+                         'instrumentalness', 'liveness', 'valence', 'loudness', 'tempo']
+    Streaming_sessions  = sessions.groupby('session_id')[cols_to_normalise]
+    mu = Streaming_sessions.transform('mean')
+    sd = Streaming_sessions.transform('std').replace(0, np.nan)
+    sessions[cols_to_normalise] = (
+        (sessions[cols_to_normalise] - mu) / sd
+    ).fillna(0.0)
+    print("Data Normalised")
 
     users = sessions["user_id"].unique()
 

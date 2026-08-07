@@ -1,10 +1,10 @@
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+import numpy as np
 import glob
 
 def main():
     print("Reading parquet...")
-    parquet_path = '../RAW Data/Filtered_sessions.parquet'
+    parquet_path = '../RAW Data/Streaming_Sessions.parquet'
     Streaming_history = pd.read_parquet(parquet_path)
     print("Parquet Read")
 
@@ -56,12 +56,6 @@ def main():
     print("Datasets Merged")
 
     print(" ")
-
-    print("Normalising Dataset")
-    scaler = StandardScaler()
-    cols_to_normalise = ['danceability', 'energy', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'loudness','tempo']
-    Streaming_history_merged[cols_to_normalise] = scaler.fit_transform(Streaming_history_merged[cols_to_normalise])
-    print("Data Normalised")
 
     print("Writing to csv...")
     Streaming_history_merged.to_parquet('../RAW Data/Combined_Streaming_History.parquet', index=False)
