@@ -1,0 +1,40 @@
+task 11 | loss drrl | node slurmnode-gpu03
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 162 combinations...
+
+SLURM array task 11: 1 config -> ../Models/LSTM_grid_drrl_task11.csv
+Trying: {'hidden_units': 64, 'dropout_rate': 0.1, 'num_layers': 2, 'lr': 0.0001, 'gamma': 4}
+Epoch 1 | Loss: -0.2177 | Val NDCG: 0.7065 | smoothed: 0.7065
+Epoch 2 | Loss: -0.2311 | Val NDCG: 0.6981 | smoothed: 0.7023
+Epoch 3 | Loss: -0.2318 | Val NDCG: 0.6794 | smoothed: 0.6946
+Epoch 4 | Loss: -0.2321 | Val NDCG: 0.7255 | smoothed: 0.7010
+Epoch 5 | Loss: -0.2322 | Val NDCG: 0.7595 | smoothed: 0.7214
+Epoch 6 | Loss: -0.2322 | Val NDCG: 0.7570 | smoothed: 0.7473
+Epoch 7 | Loss: -0.2323 | Val NDCG: 0.7429 | smoothed: 0.7531
+Epoch 8 | Loss: -0.2323 | Val NDCG: 0.7801 | smoothed: 0.7600
+Epoch 9 | Loss: -0.2324 | Val NDCG: 0.7346 | smoothed: 0.7526
+Epoch 10 | Loss: -0.2324 | Val NDCG: 0.7364 | smoothed: 0.7504
+Epoch 11 | Loss: -0.2324 | Val NDCG: 0.7494 | smoothed: 0.7401
+Epoch 12 | Loss: -0.2324 | Val NDCG: 0.7282 | smoothed: 0.7380
+Epoch 13 | Loss: -0.2325 | Val NDCG: 0.7902 | smoothed: 0.7559
+
+Best smoothed NDCG: 0.7600 at epoch 8 of 13 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers     lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+           64           0.1           2 0.0001      4  0.760038      0.780131           8          13          40     0
+
+Best config: {'hidden_units': 64.0, 'dropout_rate': 0.1, 'num_layers': 2.0, 'lr': 0.0001, 'gamma': 4.0, 'val_ndcg': 0.7600382983315414, 'val_ndcg_raw': 0.7801308594509492, 'best_epoch': 8.0, 'epochs_run': 13.0, 'max_epochs': 40.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_drrl_best_params.json
