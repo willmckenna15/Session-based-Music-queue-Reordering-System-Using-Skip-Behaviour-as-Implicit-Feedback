@@ -3,3 +3,51 @@ Tesla P100-PCIE-16GB, 16384 MiB
 Tesla P100-PCIE-16GB, 16384 MiB
 Tesla P100-PCIE-16GB, 16384 MiB
 Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 54 combinations...
+
+SLURM array task 17: 1 config -> ../Models/LSTM_grid_bce_task17.csv
+Trying: {'hidden_units': 64, 'dropout_rate': 0.5, 'num_layers': 3, 'lr': 0.0001}
+Epoch 1 | Loss: 0.6091 | Val NDCG: 0.7024 | smoothed: 0.7024
+Epoch 2 | Loss: 0.5899 | Val NDCG: 0.7625 | smoothed: 0.7324
+Epoch 3 | Loss: 0.5814 | Val NDCG: 0.7494 | smoothed: 0.7381
+Epoch 4 | Loss: 0.5783 | Val NDCG: 0.7686 | smoothed: 0.7602
+Epoch 5 | Loss: 0.5749 | Val NDCG: 0.7715 | smoothed: 0.7632
+Epoch 6 | Loss: 0.5725 | Val NDCG: 0.7739 | smoothed: 0.7713
+Epoch 7 | Loss: 0.5727 | Val NDCG: 0.7706 | smoothed: 0.7720
+Epoch 8 | Loss: 0.5708 | Val NDCG: 0.7705 | smoothed: 0.7717
+Epoch 9 | Loss: 0.5697 | Val NDCG: 0.7731 | smoothed: 0.7714
+Epoch 10 | Loss: 0.5684 | Val NDCG: 0.7755 | smoothed: 0.7730
+Epoch 11 | Loss: 0.5671 | Val NDCG: 0.7724 | smoothed: 0.7737
+Epoch 12 | Loss: 0.5677 | Val NDCG: 0.7703 | smoothed: 0.7727
+Epoch 13 | Loss: 0.5668 | Val NDCG: 0.7804 | smoothed: 0.7744
+Epoch 14 | Loss: 0.5657 | Val NDCG: 0.7797 | smoothed: 0.7768
+Epoch 15 | Loss: 0.5657 | Val NDCG: 0.7752 | smoothed: 0.7785
+Epoch 16 | Loss: 0.5646 | Val NDCG: 0.7799 | smoothed: 0.7783
+Epoch 17 | Loss: 0.5663 | Val NDCG: 0.7752 | smoothed: 0.7768
+Epoch 18 | Loss: 0.5640 | Val NDCG: 0.7780 | smoothed: 0.7777
+Epoch 19 | Loss: 0.5643 | Val NDCG: 0.7811 | smoothed: 0.7781
+Epoch 20 | Loss: 0.5642 | Val NDCG: 0.7783 | smoothed: 0.7791
+Epoch 21 | Loss: 0.5629 | Val NDCG: 0.7796 | smoothed: 0.7796
+Epoch 22 | Loss: 0.5635 | Val NDCG: 0.7791 | smoothed: 0.7790
+Epoch 23 | Loss: 0.5637 | Val NDCG: 0.7781 | smoothed: 0.7789
+Epoch 24 | Loss: 0.5631 | Val NDCG: 0.7758 | smoothed: 0.7777
+Epoch 25 | Loss: 0.5627 | Val NDCG: 0.7774 | smoothed: 0.7771
+Epoch 26 | Loss: 0.5633 | Val NDCG: 0.7732 | smoothed: 0.7755
+
+Best smoothed NDCG: 0.7796 at epoch 21 of 26 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers     lr  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+           64           0.5           3 0.0001   0.77965      0.779554          21          26          40     0
+
+Best config: {'hidden_units': 64.0, 'dropout_rate': 0.5, 'num_layers': 3.0, 'lr': 0.0001, 'val_ndcg': 0.7796497457023533, 'val_ndcg_raw': 0.7795542155848336, 'best_epoch': 21.0, 'epochs_run': 26.0, 'max_epochs': 40.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_bce_best_params.json
