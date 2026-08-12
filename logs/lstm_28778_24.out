@@ -1,0 +1,47 @@
+task 24 | loss bce | node slurmnode-gpu08
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 54 combinations...
+
+SLURM array task 24: 1 config -> ../Models/LSTM_grid_bce_task24.csv
+Trying: {'hidden_units': 128, 'dropout_rate': 0.3, 'num_layers': 1, 'lr': 0.001}
+Epoch 1 | Loss: 0.5744 | Val NDCG: 0.7844 | smoothed: 0.7844
+Epoch 2 | Loss: 0.5635 | Val NDCG: 0.7874 | smoothed: 0.7859
+Epoch 3 | Loss: 0.5599 | Val NDCG: 0.7806 | smoothed: 0.7841
+Epoch 4 | Loss: 0.5578 | Val NDCG: 0.7878 | smoothed: 0.7853
+Epoch 5 | Loss: 0.5567 | Val NDCG: 0.7815 | smoothed: 0.7833
+Epoch 6 | Loss: 0.5547 | Val NDCG: 0.7897 | smoothed: 0.7863
+Epoch 7 | Loss: 0.5528 | Val NDCG: 0.7900 | smoothed: 0.7871
+Epoch 8 | Loss: 0.5531 | Val NDCG: 0.7897 | smoothed: 0.7898
+Epoch 9 | Loss: 0.5520 | Val NDCG: 0.7877 | smoothed: 0.7892
+Epoch 10 | Loss: 0.5494 | Val NDCG: 0.7893 | smoothed: 0.7889
+Epoch 11 | Loss: 0.5492 | Val NDCG: 0.7934 | smoothed: 0.7901
+Epoch 12 | Loss: 0.5495 | Val NDCG: 0.7903 | smoothed: 0.7910
+Epoch 13 | Loss: 0.5490 | Val NDCG: 0.7932 | smoothed: 0.7923
+Epoch 14 | Loss: 0.5477 | Val NDCG: 0.7952 | smoothed: 0.7929
+Epoch 15 | Loss: 0.5476 | Val NDCG: 0.7923 | smoothed: 0.7936
+Epoch 16 | Loss: 0.5466 | Val NDCG: 0.7961 | smoothed: 0.7945
+Epoch 17 | Loss: 0.5458 | Val NDCG: 0.7948 | smoothed: 0.7944
+Epoch 18 | Loss: 0.5448 | Val NDCG: 0.7947 | smoothed: 0.7952
+Epoch 19 | Loss: 0.5451 | Val NDCG: 0.7959 | smoothed: 0.7951
+Epoch 20 | Loss: 0.5441 | Val NDCG: 0.7945 | smoothed: 0.7950
+
+Best smoothed NDCG: 0.7952 at epoch 18 of 20 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers    lr  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+          128           0.3           1 0.001  0.795197      0.794709          18          20          20     0
+
+Best config: {'hidden_units': 128.0, 'dropout_rate': 0.3, 'num_layers': 1.0, 'lr': 0.001, 'val_ndcg': 0.7951971400711676, 'val_ndcg_raw': 0.7947093823041748, 'best_epoch': 18.0, 'epochs_run': 20.0, 'max_epochs': 20.0, 'seed': 0.0}
+1 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_bce_best_params.json

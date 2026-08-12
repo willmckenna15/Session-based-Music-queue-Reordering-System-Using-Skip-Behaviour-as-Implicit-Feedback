@@ -1,0 +1,2 @@
+hidden_units,dropout_rate,num_layers,lr,val_ndcg,val_ndcg_raw,best_epoch,epochs_run,max_epochs,seed
+64,0.5,1,0.001,0.7915735388072674,0.7914886274042123,20,20,20,0

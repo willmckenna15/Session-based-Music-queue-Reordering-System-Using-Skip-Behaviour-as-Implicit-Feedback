@@ -1,0 +1,42 @@
+task 5 | loss bce | node slurmnode-gpu02
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 54 combinations...
+
+SLURM array task 5: 1 config -> ../Models/LSTM_grid_bce_task5.csv
+Trying: {'hidden_units': 64, 'dropout_rate': 0.1, 'num_layers': 3, 'lr': 0.0001}
+Epoch 1 | Loss: 0.6043 | Val NDCG: 0.7411 | smoothed: 0.7411
+Epoch 2 | Loss: 0.5802 | Val NDCG: 0.7643 | smoothed: 0.7527
+Epoch 3 | Loss: 0.5706 | Val NDCG: 0.7702 | smoothed: 0.7585
+Epoch 4 | Loss: 0.5680 | Val NDCG: 0.7814 | smoothed: 0.7720
+Epoch 5 | Loss: 0.5661 | Val NDCG: 0.7766 | smoothed: 0.7761
+Epoch 6 | Loss: 0.5641 | Val NDCG: 0.7802 | smoothed: 0.7794
+Epoch 7 | Loss: 0.5653 | Val NDCG: 0.7772 | smoothed: 0.7780
+Epoch 8 | Loss: 0.5640 | Val NDCG: 0.7769 | smoothed: 0.7781
+Epoch 9 | Loss: 0.5636 | Val NDCG: 0.7761 | smoothed: 0.7767
+Epoch 10 | Loss: 0.5625 | Val NDCG: 0.7775 | smoothed: 0.7768
+Epoch 11 | Loss: 0.5614 | Val NDCG: 0.7787 | smoothed: 0.7774
+
+Best smoothed NDCG: 0.7794 at epoch 6 of 11 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers     lr  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+           64           0.1           3 0.0001  0.779415      0.780201           6          11          40     0
+
+Best config: {'hidden_units': 64.0, 'dropout_rate': 0.1, 'num_layers': 3.0, 'lr': 0.0001, 'val_ndcg': 0.7794149395538837, 'val_ndcg_raw': 0.7802013638968428, 'best_epoch': 6.0, 'epochs_run': 11.0, 'max_epochs': 40.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_bce_best_params.json

@@ -1,0 +1,42 @@
+task 10 | loss bce | node slurmnode-gpu02
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 54 combinations...
+
+SLURM array task 10: 1 config -> ../Models/LSTM_grid_bce_task10.csv
+Trying: {'hidden_units': 64, 'dropout_rate': 0.3, 'num_layers': 3, 'lr': 0.001}
+Epoch 1 | Loss: 0.5815 | Val NDCG: 0.7797 | smoothed: 0.7797
+Epoch 2 | Loss: 0.5670 | Val NDCG: 0.7770 | smoothed: 0.7783
+Epoch 3 | Loss: 0.5630 | Val NDCG: 0.7797 | smoothed: 0.7788
+Epoch 4 | Loss: 0.5620 | Val NDCG: 0.7843 | smoothed: 0.7803
+Epoch 5 | Loss: 0.5607 | Val NDCG: 0.7832 | smoothed: 0.7824
+Epoch 6 | Loss: 0.5584 | Val NDCG: 0.7886 | smoothed: 0.7854
+Epoch 7 | Loss: 0.5592 | Val NDCG: 0.7829 | smoothed: 0.7849
+Epoch 8 | Loss: 0.5572 | Val NDCG: 0.7828 | smoothed: 0.7848
+Epoch 9 | Loss: 0.5564 | Val NDCG: 0.7815 | smoothed: 0.7824
+Epoch 10 | Loss: 0.5552 | Val NDCG: 0.7858 | smoothed: 0.7834
+Epoch 11 | Loss: 0.5535 | Val NDCG: 0.7869 | smoothed: 0.7847
+
+Best smoothed NDCG: 0.7854 at epoch 6 of 11 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers    lr  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+           64           0.3           3 0.001  0.785392      0.788637           6          11          20     0
+
+Best config: {'hidden_units': 64.0, 'dropout_rate': 0.3, 'num_layers': 3.0, 'lr': 0.001, 'val_ndcg': 0.7853924531143051, 'val_ndcg_raw': 0.7886367201782424, 'best_epoch': 6.0, 'epochs_run': 11.0, 'max_epochs': 20.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_bce_best_params.json
