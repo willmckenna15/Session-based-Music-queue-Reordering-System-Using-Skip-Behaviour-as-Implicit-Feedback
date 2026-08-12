@@ -3,7 +3,7 @@
 #SBATCH --partition=gpu
 #SBATCH --output=logs/sasrec_%A_%a.out
 #SBATCH --error=logs/sasrec_%A_%a.err
-#SBATCH --gpus=1
+#SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --time=1-00:00:00
