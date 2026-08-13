@@ -1,0 +1,40 @@
+task 25 | loss drrl | node slurmnode-gpu02
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 486 combinations...
+
+SLURM array task 25: 1 config -> ../Models/sasrec_grid_drrl_task25.csv
+Trying: {'hidden_units': 64, 'dropout_rate': 0.1, 'num_blocks': 2, 'num_heads': 8, 'lr': 0.001, 'gamma': 3}
+Epoch 1 | Loss: -0.1940 | Val NDCG: 0.7218 | smoothed: 0.7218
+Epoch 2 | Loss: -0.2250 | Val NDCG: 0.7410 | smoothed: 0.7314
+Epoch 3 | Loss: -0.2275 | Val NDCG: 0.7536 | smoothed: 0.7388
+Epoch 4 | Loss: -0.2283 | Val NDCG: 0.7524 | smoothed: 0.7490
+Epoch 5 | Loss: -0.2291 | Val NDCG: 0.7374 | smoothed: 0.7478
+Epoch 6 | Loss: -0.2298 | Val NDCG: 0.7422 | smoothed: 0.7440
+Epoch 7 | Loss: -0.2299 | Val NDCG: 0.7435 | smoothed: 0.7410
+Epoch 8 | Loss: -0.2303 | Val NDCG: 0.7566 | smoothed: 0.7474
+Epoch 9 | Loss: -0.2306 | Val NDCG: 0.7450 | smoothed: 0.7484
+
+Best smoothed NDCG: 0.7490 at epoch 4 of 9 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads    lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+           64           0.1           2          8 0.001      3  0.749002      0.752363           4           9          20
+
+Best config: {'hidden_units': 64.0, 'dropout_rate': 0.1, 'num_blocks': 2.0, 'num_heads': 8.0, 'lr': 0.001, 'gamma': 3.0, 'val_ndcg': 0.7490015318105175, 'val_ndcg_raw': 0.7523634117174519, 'best_epoch': 4.0, 'epochs_run': 9.0, 'max_epochs': 20.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_drrl_best_params.json

@@ -1,0 +1,42 @@
+task 22 | loss drrl | node slurmnode-gpu02
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 162 combinations...
+
+SLURM array task 22: 1 config -> ../Models/LSTM_grid_drrl_task22.csv
+Trying: {'hidden_units': 64, 'dropout_rate': 0.3, 'num_layers': 1, 'lr': 0.0001, 'gamma': 3}
+Epoch 1 | Loss: -0.1918 | Val NDCG: 0.7289 | smoothed: 0.7289
+Epoch 2 | Loss: -0.2256 | Val NDCG: 0.7494 | smoothed: 0.7392
+Epoch 3 | Loss: -0.2285 | Val NDCG: 0.7371 | smoothed: 0.7385
+Epoch 4 | Loss: -0.2298 | Val NDCG: 0.7455 | smoothed: 0.7440
+Epoch 5 | Loss: -0.2306 | Val NDCG: 0.7536 | smoothed: 0.7454
+Epoch 6 | Loss: -0.2311 | Val NDCG: 0.7581 | smoothed: 0.7524
+Epoch 7 | Loss: -0.2314 | Val NDCG: 0.7437 | smoothed: 0.7518
+Epoch 8 | Loss: -0.2317 | Val NDCG: 0.7163 | smoothed: 0.7394
+Epoch 9 | Loss: -0.2318 | Val NDCG: 0.7602 | smoothed: 0.7400
+Epoch 10 | Loss: -0.2318 | Val NDCG: 0.7354 | smoothed: 0.7373
+Epoch 11 | Loss: -0.2320 | Val NDCG: 0.7365 | smoothed: 0.7440
+
+Best smoothed NDCG: 0.7524 at epoch 6 of 11 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers     lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+           64           0.3           1 0.0001      3  0.752427      0.758129           6          11          40     0
+
+Best config: {'hidden_units': 64.0, 'dropout_rate': 0.3, 'num_layers': 1.0, 'lr': 0.0001, 'gamma': 3.0, 'val_ndcg': 0.7524271900679356, 'val_ndcg_raw': 0.7581292676210614, 'best_epoch': 6.0, 'epochs_run': 11.0, 'max_epochs': 40.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_drrl_best_params.json

@@ -1,0 +1,2 @@
+hidden_units,dropout_rate,num_blocks,num_heads,lr,val_ndcg,val_ndcg_raw,best_epoch,epochs_run,max_epochs
+64,0.5,2,4,0.0001,0.7652295643669896,0.7651048842798207,39,40,40

@@ -1,0 +1,2 @@
+task 127 | loss pwts | node slurmnode-gpu02
+Unable to determine the device handle for GPU0000:21:00.0: Unknown Error

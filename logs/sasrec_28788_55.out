@@ -1,0 +1,47 @@
+task 55 | loss drrl | node slurmnode-gpu03
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 486 combinations...
+
+SLURM array task 55: 1 config -> ../Models/sasrec_grid_drrl_task55.csv
+Trying: {'hidden_units': 64, 'dropout_rate': 0.3, 'num_blocks': 1, 'num_heads': 4, 'lr': 0.001, 'gamma': 3}
+Epoch 1 | Loss: -0.1792 | Val NDCG: 0.7043 | smoothed: 0.7043
+Epoch 2 | Loss: -0.2276 | Val NDCG: 0.7110 | smoothed: 0.7076
+Epoch 3 | Loss: -0.2289 | Val NDCG: 0.7077 | smoothed: 0.7077
+Epoch 4 | Loss: -0.2295 | Val NDCG: 0.7182 | smoothed: 0.7123
+Epoch 5 | Loss: -0.2300 | Val NDCG: 0.7456 | smoothed: 0.7238
+Epoch 6 | Loss: -0.2302 | Val NDCG: 0.7382 | smoothed: 0.7340
+Epoch 7 | Loss: -0.2305 | Val NDCG: 0.7407 | smoothed: 0.7415
+Epoch 8 | Loss: -0.2306 | Val NDCG: 0.7356 | smoothed: 0.7382
+Epoch 9 | Loss: -0.2307 | Val NDCG: 0.7426 | smoothed: 0.7396
+Epoch 10 | Loss: -0.2307 | Val NDCG: 0.7519 | smoothed: 0.7434
+Epoch 11 | Loss: -0.2307 | Val NDCG: 0.7643 | smoothed: 0.7529
+Epoch 12 | Loss: -0.2309 | Val NDCG: 0.7658 | smoothed: 0.7607
+Epoch 13 | Loss: -0.2306 | Val NDCG: 0.7569 | smoothed: 0.7623
+Epoch 14 | Loss: -0.2308 | Val NDCG: 0.7647 | smoothed: 0.7625
+Epoch 15 | Loss: -0.2305 | Val NDCG: 0.7445 | smoothed: 0.7554
+Epoch 16 | Loss: -0.2308 | Val NDCG: 0.7683 | smoothed: 0.7592
+Epoch 17 | Loss: -0.2309 | Val NDCG: 0.7709 | smoothed: 0.7613
+Epoch 18 | Loss: -0.2306 | Val NDCG: 0.7683 | smoothed: 0.7692
+Epoch 19 | Loss: -0.2310 | Val NDCG: 0.7610 | smoothed: 0.7667
+Epoch 20 | Loss: -0.2311 | Val NDCG: 0.7696 | smoothed: 0.7663
+
+Best smoothed NDCG: 0.7692 at epoch 18 of 20 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads    lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+           64           0.3           1          4 0.001      3   0.76919      0.768299          18          20          20
+
+Best config: {'hidden_units': 64.0, 'dropout_rate': 0.3, 'num_blocks': 1.0, 'num_heads': 4.0, 'lr': 0.001, 'gamma': 3.0, 'val_ndcg': 0.7691895613404257, 'val_ndcg_raw': 0.7682994160141648, 'best_epoch': 18.0, 'epochs_run': 20.0, 'max_epochs': 20.0}
+1 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_drrl_best_params.json

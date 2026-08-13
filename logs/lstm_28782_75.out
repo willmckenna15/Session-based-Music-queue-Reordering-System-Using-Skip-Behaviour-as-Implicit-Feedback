@@ -1,0 +1,41 @@
+task 75 | loss drrl | node slurmnode-gpu02
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 162 combinations...
+
+SLURM array task 75: 1 config -> ../Models/LSTM_grid_drrl_task75.csv
+Trying: {'hidden_units': 128, 'dropout_rate': 0.3, 'num_layers': 1, 'lr': 0.0001, 'gamma': 2}
+Epoch 1 | Loss: -0.2052 | Val NDCG: 0.7344 | smoothed: 0.7344
+Epoch 2 | Loss: -0.2253 | Val NDCG: 0.7433 | smoothed: 0.7388
+Epoch 3 | Loss: -0.2282 | Val NDCG: 0.7590 | smoothed: 0.7455
+Epoch 4 | Loss: -0.2294 | Val NDCG: 0.7390 | smoothed: 0.7471
+Epoch 5 | Loss: -0.2303 | Val NDCG: 0.7517 | smoothed: 0.7499
+Epoch 6 | Loss: -0.2307 | Val NDCG: 0.7487 | smoothed: 0.7465
+Epoch 7 | Loss: -0.2311 | Val NDCG: 0.7306 | smoothed: 0.7436
+Epoch 8 | Loss: -0.2313 | Val NDCG: 0.7267 | smoothed: 0.7353
+Epoch 9 | Loss: -0.2315 | Val NDCG: 0.7116 | smoothed: 0.7229
+Epoch 10 | Loss: -0.2315 | Val NDCG: 0.7588 | smoothed: 0.7324
+
+Best smoothed NDCG: 0.7499 at epoch 5 of 10 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers     lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+          128           0.3           1 0.0001      2  0.749887      0.751663           5          10          40     0
+
+Best config: {'hidden_units': 128.0, 'dropout_rate': 0.3, 'num_layers': 1.0, 'lr': 0.0001, 'gamma': 2.0, 'val_ndcg': 0.7498871766266121, 'val_ndcg_raw': 0.7516634870945736, 'best_epoch': 5.0, 'epochs_run': 10.0, 'max_epochs': 40.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_drrl_best_params.json

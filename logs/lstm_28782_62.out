@@ -1,0 +1,42 @@
+task 62 | loss drrl | node slurmnode-gpu02
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 162 combinations...
+
+SLURM array task 62: 1 config -> ../Models/LSTM_grid_drrl_task62.csv
+Trying: {'hidden_units': 128, 'dropout_rate': 0.1, 'num_layers': 2, 'lr': 0.001, 'gamma': 4}
+Epoch 1 | Loss: -0.2229 | Val NDCG: 0.7379 | smoothed: 0.7379
+Epoch 2 | Loss: -0.2292 | Val NDCG: 0.7833 | smoothed: 0.7606
+Epoch 3 | Loss: -0.2298 | Val NDCG: 0.7880 | smoothed: 0.7697
+Epoch 4 | Loss: -0.2302 | Val NDCG: 0.8006 | smoothed: 0.7907
+Epoch 5 | Loss: -0.2305 | Val NDCG: 0.7896 | smoothed: 0.7927
+Epoch 6 | Loss: -0.2306 | Val NDCG: 0.7934 | smoothed: 0.7945
+Epoch 7 | Loss: -0.2308 | Val NDCG: 0.7363 | smoothed: 0.7731
+Epoch 8 | Loss: -0.2308 | Val NDCG: 0.7806 | smoothed: 0.7701
+Epoch 9 | Loss: -0.2309 | Val NDCG: 0.7493 | smoothed: 0.7554
+Epoch 10 | Loss: -0.2311 | Val NDCG: 0.7754 | smoothed: 0.7684
+Epoch 11 | Loss: -0.2312 | Val NDCG: 0.7670 | smoothed: 0.7639
+
+Best smoothed NDCG: 0.7945 at epoch 6 of 11 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers    lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+          128           0.1           2 0.001      4  0.794538      0.793413           6          11          20     0
+
+Best config: {'hidden_units': 128.0, 'dropout_rate': 0.1, 'num_layers': 2.0, 'lr': 0.001, 'gamma': 4.0, 'val_ndcg': 0.7945384162617333, 'val_ndcg_raw': 0.7934134914522948, 'best_epoch': 6.0, 'epochs_run': 11.0, 'max_epochs': 20.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_drrl_best_params.json

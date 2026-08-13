@@ -1,0 +1,50 @@
+task 38 | loss pwts | node slurmnode-gpu02
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 54 combinations...
+
+SLURM array task 38: 1 config -> ../Models/LSTM_grid_pwts_task38.csv
+Trying: {'hidden_units': 256, 'dropout_rate': 0.1, 'num_layers': 2, 'lr': 0.001}
+Epoch 1 | Loss: 0.5997 | Val NDCG: 0.7758 | smoothed: 0.7758
+Epoch 2 | Loss: 0.5887 | Val NDCG: 0.7844 | smoothed: 0.7801
+Epoch 3 | Loss: 0.5854 | Val NDCG: 0.7833 | smoothed: 0.7812
+Epoch 4 | Loss: 0.5819 | Val NDCG: 0.7881 | smoothed: 0.7853
+Epoch 5 | Loss: 0.5794 | Val NDCG: 0.7812 | smoothed: 0.7842
+Epoch 6 | Loss: 0.5775 | Val NDCG: 0.7880 | smoothed: 0.7858
+Epoch 7 | Loss: 0.5756 | Val NDCG: 0.7861 | smoothed: 0.7851
+Epoch 8 | Loss: 0.5744 | Val NDCG: 0.7901 | smoothed: 0.7881
+Epoch 9 | Loss: 0.5725 | Val NDCG: 0.7823 | smoothed: 0.7862
+Epoch 10 | Loss: 0.5704 | Val NDCG: 0.7871 | smoothed: 0.7865
+Epoch 11 | Loss: 0.5697 | Val NDCG: 0.7893 | smoothed: 0.7862
+Epoch 12 | Loss: 0.5681 | Val NDCG: 0.7890 | smoothed: 0.7885
+Epoch 13 | Loss: 0.5638 | Val NDCG: 0.7873 | smoothed: 0.7885
+Epoch 14 | Loss: 0.5635 | Val NDCG: 0.7898 | smoothed: 0.7887
+Epoch 15 | Loss: 0.5609 | Val NDCG: 0.7864 | smoothed: 0.7878
+Epoch 16 | Loss: 0.5576 | Val NDCG: 0.7870 | smoothed: 0.7877
+Epoch 17 | Loss: 0.5551 | Val NDCG: 0.7905 | smoothed: 0.7880
+Epoch 18 | Loss: 0.5525 | Val NDCG: 0.7877 | smoothed: 0.7884
+Epoch 19 | Loss: 0.5502 | Val NDCG: 0.7861 | smoothed: 0.7881
+
+Best smoothed NDCG: 0.7887 at epoch 14 of 19 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers    lr  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+          256           0.1           2 0.001  0.788679      0.789754          14          19          20     0
+
+Best config: {'hidden_units': 256.0, 'dropout_rate': 0.1, 'num_layers': 2.0, 'lr': 0.001, 'val_ndcg': 0.7886787408866885, 'val_ndcg_raw': 0.7897542267772057, 'best_epoch': 14.0, 'epochs_run': 19.0, 'max_epochs': 20.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_pwts_best_params.json

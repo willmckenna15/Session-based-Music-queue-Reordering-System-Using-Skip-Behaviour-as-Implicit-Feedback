@@ -1,0 +1,41 @@
+task 48 | loss drrl | node slurmnode-gpu03
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 162 combinations...
+
+SLURM array task 48: 1 config -> ../Models/LSTM_grid_drrl_task48.csv
+Trying: {'hidden_units': 64, 'dropout_rate': 0.5, 'num_layers': 3, 'lr': 0.001, 'gamma': 2}
+Epoch 1 | Loss: -0.2205 | Val NDCG: 0.7252 | smoothed: 0.7252
+Epoch 2 | Loss: -0.2279 | Val NDCG: 0.7857 | smoothed: 0.7555
+Epoch 3 | Loss: -0.2286 | Val NDCG: 0.7630 | smoothed: 0.7580
+Epoch 4 | Loss: -0.2291 | Val NDCG: 0.7907 | smoothed: 0.7798
+Epoch 5 | Loss: -0.2291 | Val NDCG: 0.7875 | smoothed: 0.7804
+Epoch 6 | Loss: -0.2293 | Val NDCG: 0.7705 | smoothed: 0.7829
+Epoch 7 | Loss: -0.2294 | Val NDCG: 0.8001 | smoothed: 0.7860
+Epoch 8 | Loss: -0.2296 | Val NDCG: 0.7966 | smoothed: 0.7890
+Epoch 9 | Loss: -0.2296 | Val NDCG: 0.7972 | smoothed: 0.7980
+Epoch 10 | Loss: -0.2297 | Val NDCG: 0.7903 | smoothed: 0.7947
+Epoch 11 | Loss: -0.2298 | Val NDCG: 0.7945 | smoothed: 0.7940
+Epoch 12 | Loss: -0.2299 | Val NDCG: 0.7959 | smoothed: 0.7936
+Epoch 13 | Loss: -0.2299 | Val NDCG: 0.7861 | smoothed: 0.7922
+Epoch 14 | Loss: -0.2301 | Val NDCG: 0.7830 | smoothed: 0.7884
+
+Best smoothed NDCG: 0.7980 at epoch 9 of 14 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers    lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+           64           0.5           3 0.001      2  0.797952      0.797193           9          14          20     0
+
+Best config: {'hidden_units': 64.0, 'dropout_rate': 0.5, 'num_layers': 3.0, 'lr': 0.001, 'gamma': 2.0, 'val_ndcg': 0.7979519042551381, 'val_ndcg_raw': 0.7971925593433763, 'best_epoch': 9.0, 'epochs_run': 14.0, 'max_epochs': 20.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_drrl_best_params.json

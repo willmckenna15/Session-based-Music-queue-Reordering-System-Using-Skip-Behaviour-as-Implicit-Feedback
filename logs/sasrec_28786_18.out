@@ -1,0 +1,51 @@
+task 18 | loss pwts | node slurmnode-gpu02
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 162 combinations...
+
+SLURM array task 18: 1 config -> ../Models/sasrec_grid_pwts_task18.csv
+Trying: {'hidden_units': 64, 'dropout_rate': 0.3, 'num_blocks': 1, 'num_heads': 4, 'lr': 0.001}
+Epoch 1 | Loss: 0.6283 | Val NDCG: 0.7566 | smoothed: 0.7566
+Epoch 2 | Loss: 0.6123 | Val NDCG: 0.7654 | smoothed: 0.7610
+Epoch 3 | Loss: 0.6109 | Val NDCG: 0.7664 | smoothed: 0.7628
+Epoch 4 | Loss: 0.6070 | Val NDCG: 0.7698 | smoothed: 0.7672
+Epoch 5 | Loss: 0.6063 | Val NDCG: 0.7674 | smoothed: 0.7679
+Epoch 6 | Loss: 0.6054 | Val NDCG: 0.7714 | smoothed: 0.7696
+Epoch 7 | Loss: 0.6047 | Val NDCG: 0.7703 | smoothed: 0.7697
+Epoch 8 | Loss: 0.6045 | Val NDCG: 0.7706 | smoothed: 0.7708
+Epoch 9 | Loss: 0.6045 | Val NDCG: 0.7725 | smoothed: 0.7711
+Epoch 10 | Loss: 0.6032 | Val NDCG: 0.7753 | smoothed: 0.7728
+Epoch 11 | Loss: 0.6031 | Val NDCG: 0.7724 | smoothed: 0.7734
+Epoch 12 | Loss: 0.6024 | Val NDCG: 0.7752 | smoothed: 0.7743
+Epoch 13 | Loss: 0.6021 | Val NDCG: 0.7757 | smoothed: 0.7744
+Epoch 14 | Loss: 0.6019 | Val NDCG: 0.7743 | smoothed: 0.7751
+Epoch 15 | Loss: 0.6005 | Val NDCG: 0.7768 | smoothed: 0.7756
+Epoch 16 | Loss: 0.6009 | Val NDCG: 0.7787 | smoothed: 0.7766
+Epoch 17 | Loss: 0.6011 | Val NDCG: 0.7751 | smoothed: 0.7768
+Epoch 18 | Loss: 0.6008 | Val NDCG: 0.7733 | smoothed: 0.7757
+Epoch 19 | Loss: 0.6003 | Val NDCG: 0.7749 | smoothed: 0.7745
+Epoch 20 | Loss: 0.5993 | Val NDCG: 0.7762 | smoothed: 0.7748
+
+Best smoothed NDCG: 0.7768 at epoch 17 of 20 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads    lr  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+           64           0.3           1          4 0.001  0.776831       0.77507          17          20          20
+
+Best config: {'hidden_units': 64.0, 'dropout_rate': 0.3, 'num_blocks': 1.0, 'num_heads': 4.0, 'lr': 0.001, 'val_ndcg': 0.7768310451033037, 'val_ndcg_raw': 0.7750697386876091, 'best_epoch': 17.0, 'epochs_run': 20.0, 'max_epochs': 20.0}
+1 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_pwts_best_params.json

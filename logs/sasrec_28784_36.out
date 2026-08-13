@@ -1,0 +1,44 @@
+task 36 | loss bce | node slurmnode-gpu02
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+NVIDIA GeForce GTX 1080 Ti, 11264 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 162 combinations...
+
+SLURM array task 36: 1 config -> ../Models/sasrec_grid_bce_task36.csv
+Trying: {'hidden_units': 64, 'dropout_rate': 0.5, 'num_blocks': 1, 'num_heads': 4, 'lr': 0.001}
+Epoch 1 | Loss: 0.6030 | Val NDCG: 0.7575 | smoothed: 0.7575
+Epoch 2 | Loss: 0.5876 | Val NDCG: 0.7646 | smoothed: 0.7610
+Epoch 3 | Loss: 0.5851 | Val NDCG: 0.7692 | smoothed: 0.7638
+Epoch 4 | Loss: 0.5826 | Val NDCG: 0.7715 | smoothed: 0.7684
+Epoch 5 | Loss: 0.5814 | Val NDCG: 0.7713 | smoothed: 0.7707
+Epoch 6 | Loss: 0.5808 | Val NDCG: 0.7727 | smoothed: 0.7718
+Epoch 7 | Loss: 0.5805 | Val NDCG: 0.7735 | smoothed: 0.7725
+Epoch 8 | Loss: 0.5791 | Val NDCG: 0.7733 | smoothed: 0.7732
+Epoch 9 | Loss: 0.5796 | Val NDCG: 0.7700 | smoothed: 0.7723
+Epoch 10 | Loss: 0.5794 | Val NDCG: 0.7710 | smoothed: 0.7714
+Epoch 11 | Loss: 0.5789 | Val NDCG: 0.7705 | smoothed: 0.7705
+Epoch 12 | Loss: 0.5775 | Val NDCG: 0.7717 | smoothed: 0.7711
+Epoch 13 | Loss: 0.5776 | Val NDCG: 0.7739 | smoothed: 0.7720
+
+Best smoothed NDCG: 0.7732 at epoch 8 of 13 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads    lr  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+           64           0.5           1          4 0.001  0.773151      0.773263           8          13          20
+
+Best config: {'hidden_units': 64.0, 'dropout_rate': 0.5, 'num_blocks': 1.0, 'num_heads': 4.0, 'lr': 0.001, 'val_ndcg': 0.7731508447229922, 'val_ndcg_raw': 0.7732626650622707, 'best_epoch': 8.0, 'epochs_run': 13.0, 'max_epochs': 20.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_bce_best_params.json

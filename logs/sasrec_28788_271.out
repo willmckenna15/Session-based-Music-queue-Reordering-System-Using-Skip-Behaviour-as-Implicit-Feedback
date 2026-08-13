@@ -1,0 +1,2 @@
+task 271 | loss drrl | node slurmnode-gpu02
+Unable to determine the device handle for GPU0000:21:00.0: Unknown Error

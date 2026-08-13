@@ -1,0 +1,44 @@
+task 40 | loss bce | node slurmnode-gpu03
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 54 combinations...
+
+SLURM array task 40: 1 config -> ../Models/LSTM_grid_bce_task40.csv
+Trying: {'hidden_units': 256, 'dropout_rate': 0.1, 'num_layers': 3, 'lr': 0.001}
+Epoch 1 | Loss: 0.5720 | Val NDCG: 0.7819 | smoothed: 0.7819
+Epoch 2 | Loss: 0.5625 | Val NDCG: 0.7756 | smoothed: 0.7787
+Epoch 3 | Loss: 0.5601 | Val NDCG: 0.7845 | smoothed: 0.7807
+Epoch 4 | Loss: 0.5546 | Val NDCG: 0.7871 | smoothed: 0.7824
+Epoch 5 | Loss: 0.5520 | Val NDCG: 0.7882 | smoothed: 0.7866
+Epoch 6 | Loss: 0.5521 | Val NDCG: 0.7891 | smoothed: 0.7882
+Epoch 7 | Loss: 0.5500 | Val NDCG: 0.7901 | smoothed: 0.7891
+Epoch 8 | Loss: 0.5479 | Val NDCG: 0.7938 | smoothed: 0.7910
+Epoch 9 | Loss: 0.5458 | Val NDCG: 0.7857 | smoothed: 0.7898
+Epoch 10 | Loss: 0.5438 | Val NDCG: 0.7922 | smoothed: 0.7906
+Epoch 11 | Loss: 0.5430 | Val NDCG: 0.7928 | smoothed: 0.7902
+Epoch 12 | Loss: 0.5422 | Val NDCG: 0.7911 | smoothed: 0.7920
+Epoch 13 | Loss: 0.5405 | Val NDCG: 0.7884 | smoothed: 0.7908
+Epoch 14 | Loss: 0.5381 | Val NDCG: 0.7904 | smoothed: 0.7900
+Epoch 15 | Loss: 0.5363 | Val NDCG: 0.7895 | smoothed: 0.7895
+Epoch 16 | Loss: 0.5335 | Val NDCG: 0.7901 | smoothed: 0.7900
+Epoch 17 | Loss: 0.5312 | Val NDCG: 0.7888 | smoothed: 0.7895
+
+Best smoothed NDCG: 0.7920 at epoch 12 of 17 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers    lr  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+          256           0.1           3 0.001  0.792038      0.791087          12          17          20     0
+
+Best config: {'hidden_units': 256.0, 'dropout_rate': 0.1, 'num_layers': 3.0, 'lr': 0.001, 'val_ndcg': 0.7920380189458979, 'val_ndcg_raw': 0.7910872662923358, 'best_epoch': 12.0, 'epochs_run': 17.0, 'max_epochs': 20.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_bce_best_params.json
