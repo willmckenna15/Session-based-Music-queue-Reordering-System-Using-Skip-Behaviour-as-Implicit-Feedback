@@ -19,3 +19,102 @@ NDCG@5: 0.7658
 [7/36] {'max_depth': 8, 'min_samples_leaf': 30, 'n_estimators': 100}
 NDCG@5: 0.7665 
 [8/36] {'max_depth': 8, 'min_samples_leaf': 30, 'n_estimators': 200}
+NDCG@5: 0.7655 
+[9/36] {'max_depth': 8, 'min_samples_leaf': 30, 'n_estimators': 300}
+NDCG@5: 0.7648 
+[10/36] {'max_depth': 10, 'min_samples_leaf': 10, 'n_estimators': 100}
+NDCG@5: 0.7661 
+[11/36] {'max_depth': 10, 'min_samples_leaf': 10, 'n_estimators': 200}
+NDCG@5: 0.7663 
+[12/36] {'max_depth': 10, 'min_samples_leaf': 10, 'n_estimators': 300}
+NDCG@5: 0.7659 
+[13/36] {'max_depth': 10, 'min_samples_leaf': 20, 'n_estimators': 100}
+NDCG@5: 0.7663 
+[14/36] {'max_depth': 10, 'min_samples_leaf': 20, 'n_estimators': 200}
+NDCG@5: 0.7660 
+[15/36] {'max_depth': 10, 'min_samples_leaf': 20, 'n_estimators': 300}
+NDCG@5: 0.7661 
+[16/36] {'max_depth': 10, 'min_samples_leaf': 30, 'n_estimators': 100}
+NDCG@5: 0.7664 
+[17/36] {'max_depth': 10, 'min_samples_leaf': 30, 'n_estimators': 200}
+NDCG@5: 0.7660 
+[18/36] {'max_depth': 10, 'min_samples_leaf': 30, 'n_estimators': 300}
+NDCG@5: 0.7661 
+[19/36] {'max_depth': 12, 'min_samples_leaf': 10, 'n_estimators': 100}
+NDCG@5: 0.7676 
+[20/36] {'max_depth': 12, 'min_samples_leaf': 10, 'n_estimators': 200}
+NDCG@5: 0.7674 
+[21/36] {'max_depth': 12, 'min_samples_leaf': 10, 'n_estimators': 300}
+NDCG@5: 0.7674 
+[22/36] {'max_depth': 12, 'min_samples_leaf': 20, 'n_estimators': 100}
+NDCG@5: 0.7682 
+[23/36] {'max_depth': 12, 'min_samples_leaf': 20, 'n_estimators': 200}
+NDCG@5: 0.7680 
+[24/36] {'max_depth': 12, 'min_samples_leaf': 20, 'n_estimators': 300}
+NDCG@5: 0.7677 
+[25/36] {'max_depth': 12, 'min_samples_leaf': 30, 'n_estimators': 100}
+NDCG@5: 0.7684 
+[26/36] {'max_depth': 12, 'min_samples_leaf': 30, 'n_estimators': 200}
+NDCG@5: 0.7682 
+[27/36] {'max_depth': 12, 'min_samples_leaf': 30, 'n_estimators': 300}
+NDCG@5: 0.7674 
+[28/36] {'max_depth': 15, 'min_samples_leaf': 10, 'n_estimators': 100}
+NDCG@5: 0.7689 
+[29/36] {'max_depth': 15, 'min_samples_leaf': 10, 'n_estimators': 200}
+NDCG@5: 0.7689 
+[30/36] {'max_depth': 15, 'min_samples_leaf': 10, 'n_estimators': 300}
+NDCG@5: 0.7688 
+[31/36] {'max_depth': 15, 'min_samples_leaf': 20, 'n_estimators': 100}
+NDCG@5: 0.7689 
+[32/36] {'max_depth': 15, 'min_samples_leaf': 20, 'n_estimators': 200}
+NDCG@5: 0.7690 
+[33/36] {'max_depth': 15, 'min_samples_leaf': 20, 'n_estimators': 300}
+NDCG@5: 0.7689 
+[34/36] {'max_depth': 15, 'min_samples_leaf': 30, 'n_estimators': 100}
+NDCG@5: 0.7689 
+[35/36] {'max_depth': 15, 'min_samples_leaf': 30, 'n_estimators': 200}
+NDCG@5: 0.7687 
+[36/36] {'max_depth': 15, 'min_samples_leaf': 30, 'n_estimators': 300}
+NDCG@5: 0.7686 
+
+--- Grid Search Results ---
+ max_depth  min_samples_leaf  n_estimators  val_ndcg  n_sessions
+        15                20           200  0.768991       12011
+        15                10           200  0.768923       12011
+        15                30           100  0.768921       12011
+        15                20           300  0.768909       12011
+        15                20           100  0.768909       12011
+        15                10           100  0.768909       12011
+        15                10           300  0.768819       12011
+        15                30           200  0.768691       12011
+        15                30           300  0.768582       12011
+        12                30           100  0.768432       12011
+        12                30           200  0.768218       12011
+        12                20           100  0.768160       12011
+        12                20           200  0.767983       12011
+        12                20           300  0.767744       12011
+        12                10           100  0.767605       12011
+        12                10           300  0.767440       12011
+        12                10           200  0.767413       12011
+        12                30           300  0.767400       12011
+         8                20           100  0.766627       12011
+         8                10           100  0.766517       12011
+         8                30           100  0.766466       12011
+        10                30           100  0.766442       12011
+        10                20           100  0.766289       12011
+        10                10           200  0.766286       12011
+        10                30           300  0.766125       12011
+        10                20           300  0.766095       12011
+        10                10           100  0.766094       12011
+        10                20           200  0.766034       12011
+        10                30           200  0.766032       12011
+        10                10           300  0.765942       12011
+         8                20           200  0.765884       12011
+         8                20           300  0.765839       12011
+         8                30           200  0.765534       12011
+         8                10           200  0.765227       12011
+         8                30           300  0.764848       12011
+         8                10           300  0.764615       12011
+
+Best config: {'max_depth': 15.0, 'min_samples_leaf': 20.0, 'n_estimators': 200.0, 'val_ndcg': 0.7689913211282676, 'n_sessions': 12011.0}
+Results saved to ../Models/extratrees_grid_search_results.csv
