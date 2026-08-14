@@ -1,0 +1,3 @@
+Pooled AUC: 0.7081
+Per-session AUC:    0.5942
+Per-session NDCG@5: 0.7584 across 12011 sessions

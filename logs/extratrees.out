@@ -1,0 +1,21 @@
+Reading Datasets...
+Indexing validation sessions...
+12011 scorable sessions of 16262
+
+Running grid search over 36 combinations...
+
+[1/36] {'max_depth': 8, 'min_samples_leaf': 10, 'n_estimators': 100}
+NDCG@5: 0.7665 
+[2/36] {'max_depth': 8, 'min_samples_leaf': 10, 'n_estimators': 200}
+NDCG@5: 0.7652 
+[3/36] {'max_depth': 8, 'min_samples_leaf': 10, 'n_estimators': 300}
+NDCG@5: 0.7646 
+[4/36] {'max_depth': 8, 'min_samples_leaf': 20, 'n_estimators': 100}
+NDCG@5: 0.7666 
+[5/36] {'max_depth': 8, 'min_samples_leaf': 20, 'n_estimators': 200}
+NDCG@5: 0.7659 
+[6/36] {'max_depth': 8, 'min_samples_leaf': 20, 'n_estimators': 300}
+NDCG@5: 0.7658 
+[7/36] {'max_depth': 8, 'min_samples_leaf': 30, 'n_estimators': 100}
+NDCG@5: 0.7665 
+[8/36] {'max_depth': 8, 'min_samples_leaf': 30, 'n_estimators': 200}

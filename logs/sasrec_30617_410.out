@@ -1,0 +1,41 @@
+task 410 | loss drrl | node slurmnode-gpu07
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 486 combinations...
+
+SLURM array task 410: 1 config -> ../Models/sasrec_grid_drrl_task410.csv
+Trying: {'hidden_units': 256, 'dropout_rate': 0.3, 'num_blocks': 2, 'num_heads': 16, 'lr': 0.001, 'gamma': 4}
+Epoch 1 | Loss: -0.1722 | Val NDCG: 0.7118 | smoothed: 0.7118
+Epoch 2 | Loss: -0.2226 | Val NDCG: 0.7484 | smoothed: 0.7301
+Epoch 3 | Loss: -0.2250 | Val NDCG: 0.7033 | smoothed: 0.7212
+Epoch 4 | Loss: -0.2266 | Val NDCG: 0.7459 | smoothed: 0.7326
+Epoch 5 | Loss: -0.2272 | Val NDCG: 0.7415 | smoothed: 0.7303
+Epoch 6 | Loss: -0.2275 | Val NDCG: 0.7652 | smoothed: 0.7509
+Epoch 7 | Loss: -0.2281 | Val NDCG: 0.7760 | smoothed: 0.7609
+Epoch 8 | Loss: -0.2283 | Val NDCG: 0.7698 | smoothed: 0.7703
+Epoch 9 | Loss: -0.2286 | Val NDCG: 0.7664 | smoothed: 0.7707
+Epoch 10 | Loss: -0.2289 | Val NDCG: 0.7607 | smoothed: 0.7656
+Epoch 11 | Loss: -0.2291 | Val NDCG: 0.7669 | smoothed: 0.7647
+Epoch 12 | Loss: -0.2292 | Val NDCG: 0.7687 | smoothed: 0.7654
+Epoch 13 | Loss: -0.2294 | Val NDCG: 0.7664 | smoothed: 0.7673
+Epoch 14 | Loss: -0.2296 | Val NDCG: 0.7672 | smoothed: 0.7674
+
+Best smoothed NDCG: 0.7707 at epoch 9 of 14 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads    lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+          256           0.3           2         16 0.001      4  0.770738      0.766442           9          14          20
+
+Best config: {'hidden_units': 256.0, 'dropout_rate': 0.3, 'num_blocks': 2.0, 'num_heads': 16.0, 'lr': 0.001, 'gamma': 4.0, 'val_ndcg': 0.7707382442227585, 'val_ndcg_raw': 0.7664424006704487, 'best_epoch': 9.0, 'epochs_run': 14.0, 'max_epochs': 20.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_drrl_best_params.json
