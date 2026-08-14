@@ -239,23 +239,12 @@ class SASRec(torch.nn.Module):
         # logits, not probabilities - see SkipLSTM.forward
         return self.output_layer(feats).squeeze(-1)
 
-def log_test(mean_auc, std_auc, experiment_name, config_description):
-    log_path = '../Models/test_log.csv'
-    entry = pd.DataFrame([{
-        'experiment': experiment_name,
-        'config': config_description,
-        'val_auc': f'{mean_auc:.4f}',
-        'std_auc': f'{std_auc:.4f}',
-        'timestamp': pd.Timestamp.now()
-    }])
+def log_test(row, log_path='../Models/test_log.csv'):
+    """Append one result row (a dict) to the test log, creating it if absent."""
+    entry = pd.DataFrame([{**row, 'timestamp': pd.Timestamp.now()}])
     if os.path.exists(log_path):
-        existing = pd.read_csv(log_path)
-        combined = pd.concat([existing, entry], ignore_index=True)
-        combined['val_auc'] = combined['val_auc'].astype(float)
-        combined = combined.sort_values('val_auc', ascending=False)
-    else:
-        combined = entry
-    combined.to_csv(log_path, index=False)
+        entry = pd.concat([pd.read_csv(log_path), entry], ignore_index=True)
+    entry.to_csv(log_path, index=False)
 
 ##Training
 

@@ -1,12 +1,10 @@
-"""Final training for SASRec using the tuned hyperparameters.
+"""Final training for SkipLSTM using the tuned hyperparameters.
 
-Selection and reporting both use NDCG@5 on a 3-epoch moving average, matching the
-tuning stage - selecting on one metric and reporting another is not defensible, and
-the raw per-epoch value swings ~0.03, which is larger than the differences being
-compared. AUC is recorded at the selected epoch so both describe the same model.
+Mirrors SASRec.py so the two are directly comparable: same selection metric,
+same smoothing, same patience, same batching, same number of seeds.
 """
 
-from Model_lib import (SessionDataset, collate_fn, SASRec, train_epoch,
+from Model_lib import (SessionDataset, collate_fn, SkipLSTM, train_epoch,
                        evaluate_sequential, log_test, LengthBucketSampler)
 import torch
 import numpy as np
@@ -14,7 +12,6 @@ import random
 from torch.utils.data import DataLoader, Subset
 from tqdm import tqdm
 import os
-import argparse
 import json
 import copy
 from Loss_functions import get_loss_criterion, parse_args, DrRLLoss, PWTSLoss
@@ -42,10 +39,10 @@ print(f"Using device: {device}")
 args = parse_args()
 loss_name = args.loss
 
-params_path = f'../Models/sasrec_{loss_name}_best_params.json'
+params_path = f'../Models/lstm_{loss_name}_best_params.json'
 if not os.path.exists(params_path):
     raise FileNotFoundError(f"Best params not found for {loss_name}. "
-                            f"Run SASRec_tuning.py --loss {loss_name} first.")
+                            f"Run RNN_tuning.py --loss {loss_name} first.")
 
 with open(params_path, 'r') as f:
     best_params = json.load(f)
@@ -59,24 +56,11 @@ print(f"Train sessions: {len(train_dataset)} | Val sessions: {len(val_dataset)}"
 
 train_lengths = [len(y) for y in train_dataset.labels]
 
-# Length-sorted evaluation order: batches otherwise pad to their longest session and
-# validation lengths span 7 to 786. Scores are unchanged - evaluate_sequential
-# averages within each session before averaging across sessions.
 val_order = np.argsort([len(y) for y in val_dataset.labels]).tolist()
 val_loader = DataLoader(Subset(val_dataset, val_order), batch_size=BATCH_SIZE,
                         shuffle=False, collate_fn=collate_fn)
 
 os.makedirs('../Models', exist_ok=True)
-
-args_mod = argparse.Namespace(
-    device=device,
-    hidden_units=int(best_params['hidden_units']),
-    maxlen=200,
-    dropout_rate=float(best_params['dropout_rate']),
-    num_blocks=int(best_params['num_blocks']),
-    num_heads=int(best_params['num_heads']),
-    norm_first=True
-)
 
 
 def build_criterion():
@@ -94,12 +78,15 @@ def run_training(seed, verbose=True):
     np.random.seed(seed)
     random.seed(seed)
 
-    # Length-bucketed batches: 6.2x less padded compute, batch order reshuffled
-    # each epoch so training stays stochastic
     train_loader = DataLoader(train_dataset, collate_fn=collate_fn,
                               batch_sampler=LengthBucketSampler(train_lengths, BATCH_SIZE))
 
-    model = SASRec(feature_no=len(features), args=args_mod).to(device)
+    model = SkipLSTM(
+        input_size=len(features),
+        hidden_size=int(best_params['hidden_units']),
+        num_layers=int(best_params['num_layers']),
+        dropout=float(best_params['dropout_rate']),
+    ).to(device)
     criterion = build_criterion()
     optimizer = torch.optim.Adam(
         list(model.parameters()) + list(criterion.parameters()),
@@ -153,20 +140,19 @@ for seed in range(N_RUNS):
     if result['val_ndcg'] > best_overall[0]:
         best_overall = (result['val_ndcg'], state)
 
-# Save the weights from the best seed, not the last
-torch.save(best_overall[1], f'../Models/sasrec_{loss_name}_best.pt')
+torch.save(best_overall[1], f'../Models/lstm_{loss_name}_best.pt')
 
 ndcgs = np.array([r['val_ndcg'] for r in runs])
 aucs = np.array([r['val_auc'] for r in runs])
 
-print(f"\n=== SASRec / {loss_name.upper()} across {N_RUNS} seeds ===")
+print(f"\n=== SkipLSTM / {loss_name.upper()} across {N_RUNS} seeds ===")
 print(f"NDCG@5 : {ndcgs.mean():.4f} +/- {ndcgs.std():.4f}   {np.round(ndcgs, 4).tolist()}")
 print(f"AUC    : {aucs.mean():.4f} +/- {aucs.std():.4f}   {np.round(aucs, 4).tolist()}")
 print(f"epochs : {[r['epochs_run'] for r in runs]}  (best at {[r['epoch'] for r in runs]})")
-print(f"Model saved to ../Models/sasrec_{loss_name}_best.pt")
+print(f"Model saved to ../Models/lstm_{loss_name}_best.pt")
 
 log_test({
-    'model': 'SASRec',
+    'model': 'SkipLSTM',
     'loss': loss_name,
     'experiment': args.experiment,
     'n_seeds': N_RUNS,
@@ -177,6 +163,6 @@ log_test({
     'epochs_run': str([r['epochs_run'] for r in runs]),
     'best_epoch': str([r['epoch'] for r in runs]),
     'params': json.dumps({k: best_params[k] for k in
-                          ('hidden_units', 'dropout_rate', 'num_blocks', 'num_heads', 'lr')
+                          ('hidden_units', 'dropout_rate', 'num_layers', 'lr')
                           if k in best_params}),
 })
