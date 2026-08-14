@@ -29,7 +29,7 @@ BATCH_SIZE = 64
 MAX_EPOCHS = 100
 PATIENCE = 5
 SMOOTH_WINDOW = 3
-N_RUNS = 3
+N_RUNS = 5
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
