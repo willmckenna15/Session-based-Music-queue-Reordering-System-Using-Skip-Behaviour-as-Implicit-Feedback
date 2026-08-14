@@ -1,0 +1,41 @@
+task 434 | loss drrl | node slurmnode-gpu03
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 486 combinations...
+
+SLURM array task 434: 1 config -> ../Models/sasrec_grid_drrl_task434.csv
+Trying: {'hidden_units': 256, 'dropout_rate': 0.5, 'num_blocks': 1, 'num_heads': 4, 'lr': 0.001, 'gamma': 4}
+Epoch 1 | Loss: -0.1791 | Val NDCG: 0.6879 | smoothed: 0.6879
+Epoch 2 | Loss: -0.2213 | Val NDCG: 0.7247 | smoothed: 0.7063
+Epoch 3 | Loss: -0.2246 | Val NDCG: 0.7243 | smoothed: 0.7123
+Epoch 4 | Loss: -0.2253 | Val NDCG: 0.7316 | smoothed: 0.7268
+Epoch 5 | Loss: -0.2269 | Val NDCG: 0.7628 | smoothed: 0.7396
+Epoch 6 | Loss: -0.2280 | Val NDCG: 0.7516 | smoothed: 0.7487
+Epoch 7 | Loss: -0.2281 | Val NDCG: 0.7539 | smoothed: 0.7561
+Epoch 8 | Loss: -0.2284 | Val NDCG: 0.7678 | smoothed: 0.7577
+Epoch 9 | Loss: -0.2279 | Val NDCG: 0.7563 | smoothed: 0.7593
+Epoch 10 | Loss: -0.2288 | Val NDCG: 0.7521 | smoothed: 0.7587
+Epoch 11 | Loss: -0.2289 | Val NDCG: 0.7655 | smoothed: 0.7580
+Epoch 12 | Loss: -0.2288 | Val NDCG: 0.7134 | smoothed: 0.7437
+Epoch 13 | Loss: -0.2287 | Val NDCG: 0.7531 | smoothed: 0.7440
+Epoch 14 | Loss: -0.2290 | Val NDCG: 0.7593 | smoothed: 0.7419
+
+Best smoothed NDCG: 0.7593 at epoch 9 of 14 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads    lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+          256           0.5           1          4 0.001      4  0.759322      0.756296           9          14          20
+
+Best config: {'hidden_units': 256.0, 'dropout_rate': 0.5, 'num_blocks': 1.0, 'num_heads': 4.0, 'lr': 0.001, 'gamma': 4.0, 'val_ndcg': 0.7593222765112575, 'val_ndcg_raw': 0.7562962827276416, 'best_epoch': 9.0, 'epochs_run': 14.0, 'max_epochs': 20.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_drrl_best_params.json

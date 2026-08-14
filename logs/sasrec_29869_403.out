@@ -1,0 +1,34 @@
+task 403 | loss drrl | node slurmnode-gpu03
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 486 combinations...
+
+SLURM array task 403: 1 config -> ../Models/sasrec_grid_drrl_task403.csv
+Trying: {'hidden_units': 256, 'dropout_rate': 0.3, 'num_blocks': 2, 'num_heads': 8, 'lr': 0.001, 'gamma': 3}
+Epoch 1 | Loss: -0.1714 | Val NDCG: 0.7355 | smoothed: 0.7355
+Epoch 2 | Loss: -0.2235 | Val NDCG: 0.7497 | smoothed: 0.7426
+Epoch 3 | Loss: -0.2263 | Val NDCG: 0.7357 | smoothed: 0.7403
+Epoch 4 | Loss: -0.2272 | Val NDCG: 0.7217 | smoothed: 0.7357
+Epoch 5 | Loss: -0.2269 | Val NDCG: 0.6770 | smoothed: 0.7115
+Epoch 6 | Loss: -0.2279 | Val NDCG: 0.7308 | smoothed: 0.7098
+Epoch 7 | Loss: -0.2285 | Val NDCG: 0.7642 | smoothed: 0.7240
+
+Best smoothed NDCG: 0.7426 at epoch 2 of 7 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads    lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+          256           0.3           2          8 0.001      3  0.742594      0.749711           2           7          20
+
+Best config: {'hidden_units': 256.0, 'dropout_rate': 0.3, 'num_blocks': 2.0, 'num_heads': 8.0, 'lr': 0.001, 'gamma': 3.0, 'val_ndcg': 0.7425939593180552, 'val_ndcg_raw': 0.7497108815555553, 'best_epoch': 2.0, 'epochs_run': 7.0, 'max_epochs': 20.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_drrl_best_params.json

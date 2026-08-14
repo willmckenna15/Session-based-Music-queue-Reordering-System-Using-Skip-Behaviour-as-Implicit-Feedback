@@ -1,0 +1,43 @@
+task 135 | loss drrl | node slurmnode-gpu03
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 162 combinations...
+
+SLURM array task 135: 1 config -> ../Models/LSTM_grid_drrl_task135.csv
+Trying: {'hidden_units': 256, 'dropout_rate': 0.3, 'num_layers': 2, 'lr': 0.0001, 'gamma': 2}
+Epoch 1 | Loss: -0.2185 | Val NDCG: 0.6242 | smoothed: 0.6242
+Epoch 2 | Loss: -0.2290 | Val NDCG: 0.6752 | smoothed: 0.6497
+Epoch 3 | Loss: -0.2298 | Val NDCG: 0.6680 | smoothed: 0.6558
+Epoch 4 | Loss: -0.2302 | Val NDCG: 0.7687 | smoothed: 0.7040
+Epoch 5 | Loss: -0.2302 | Val NDCG: 0.7498 | smoothed: 0.7288
+Epoch 6 | Loss: -0.2302 | Val NDCG: 0.7859 | smoothed: 0.7682
+Epoch 7 | Loss: -0.2306 | Val NDCG: 0.6939 | smoothed: 0.7432
+Epoch 8 | Loss: -0.2307 | Val NDCG: 0.7410 | smoothed: 0.7403
+Epoch 9 | Loss: -0.2308 | Val NDCG: 0.7515 | smoothed: 0.7288
+Epoch 10 | Loss: -0.2308 | Val NDCG: 0.7670 | smoothed: 0.7531
+Epoch 11 | Loss: -0.2309 | Val NDCG: 0.7935 | smoothed: 0.7706
+Epoch 12 | Loss: -0.2309 | Val NDCG: 0.7094 | smoothed: 0.7566
+Epoch 13 | Loss: -0.2310 | Val NDCG: 0.7569 | smoothed: 0.7533
+Epoch 14 | Loss: -0.2311 | Val NDCG: 0.7790 | smoothed: 0.7484
+Epoch 15 | Loss: -0.2311 | Val NDCG: 0.7187 | smoothed: 0.7515
+Epoch 16 | Loss: -0.2312 | Val NDCG: 0.7928 | smoothed: 0.7635
+
+Best smoothed NDCG: 0.7706 at epoch 11 of 16 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers     lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+          256           0.3           2 0.0001      2  0.770638      0.793468          11          16          40     0
+
+Best config: {'hidden_units': 256.0, 'dropout_rate': 0.3, 'num_layers': 2.0, 'lr': 0.0001, 'gamma': 2.0, 'val_ndcg': 0.7706375791288909, 'val_ndcg_raw': 0.7934675458414762, 'best_epoch': 11.0, 'epochs_run': 16.0, 'max_epochs': 40.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_drrl_best_params.json

@@ -1,0 +1,13 @@
+task 376 | loss drrl | node slurmnode-gpu03
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 486 combinations...
+
+SLURM array task 376: 1 config -> ../Models/sasrec_grid_drrl_task376.csv
+Trying: {'hidden_units': 256, 'dropout_rate': 0.1, 'num_blocks': 3, 'num_heads': 16, 'lr': 0.0001, 'gamma': 3}

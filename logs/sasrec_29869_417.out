@@ -1,0 +1,40 @@
+task 417 | loss drrl | node slurmnode-gpu03
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 486 combinations...
+
+SLURM array task 417: 1 config -> ../Models/sasrec_grid_drrl_task417.csv
+Trying: {'hidden_units': 256, 'dropout_rate': 0.3, 'num_blocks': 3, 'num_heads': 4, 'lr': 0.0001, 'gamma': 2}
+Epoch 1 | Loss: -0.0385 | Val NDCG: 0.7131 | smoothed: 0.7131
+Epoch 2 | Loss: -0.2076 | Val NDCG: 0.7115 | smoothed: 0.7123
+Epoch 3 | Loss: -0.2182 | Val NDCG: 0.7125 | smoothed: 0.7124
+Epoch 4 | Loss: -0.2213 | Val NDCG: 0.7242 | smoothed: 0.7161
+Epoch 5 | Loss: -0.2225 | Val NDCG: 0.7350 | smoothed: 0.7239
+Epoch 6 | Loss: -0.2231 | Val NDCG: 0.7419 | smoothed: 0.7337
+Epoch 7 | Loss: -0.2235 | Val NDCG: 0.7346 | smoothed: 0.7372
+Epoch 8 | Loss: -0.2251 | Val NDCG: 0.7557 | smoothed: 0.7441
+Epoch 9 | Loss: -0.2260 | Val NDCG: 0.7289 | smoothed: 0.7397
+Epoch 10 | Loss: -0.2257 | Val NDCG: 0.7291 | smoothed: 0.7379
+Epoch 11 | Loss: -0.2264 | Val NDCG: 0.7178 | smoothed: 0.7253
+Epoch 12 | Loss: -0.2265 | Val NDCG: 0.7472 | smoothed: 0.7314
+Epoch 13 | Loss: -0.2267 | Val NDCG: 0.7302 | smoothed: 0.7317
+
+Best smoothed NDCG: 0.7441 at epoch 8 of 13 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads     lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+          256           0.3           3          4 0.0001      2   0.74409      0.755701           8          13          40
+
+Best config: {'hidden_units': 256.0, 'dropout_rate': 0.3, 'num_blocks': 3.0, 'num_heads': 4.0, 'lr': 0.0001, 'gamma': 2.0, 'val_ndcg': 0.7440901827830998, 'val_ndcg_raw': 0.7557005544404204, 'best_epoch': 8.0, 'epochs_run': 13.0, 'max_epochs': 40.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_drrl_best_params.json

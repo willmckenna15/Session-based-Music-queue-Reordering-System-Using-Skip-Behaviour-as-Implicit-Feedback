@@ -1,0 +1,42 @@
+task 98 | loss pwts | node slurmnode-gpu05
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 162 combinations...
+
+SLURM array task 98: 1 config -> ../Models/sasrec_grid_pwts_task98.csv
+Trying: {'hidden_units': 128, 'dropout_rate': 0.5, 'num_blocks': 2, 'num_heads': 8, 'lr': 0.001}
+Epoch 1 | Loss: 0.6256 | Val NDCG: 0.7571 | smoothed: 0.7571
+Epoch 2 | Loss: 0.6135 | Val NDCG: 0.7596 | smoothed: 0.7584
+Epoch 3 | Loss: 0.6096 | Val NDCG: 0.7570 | smoothed: 0.7579
+Epoch 4 | Loss: 0.6072 | Val NDCG: 0.7659 | smoothed: 0.7608
+Epoch 5 | Loss: 0.6056 | Val NDCG: 0.7658 | smoothed: 0.7629
+Epoch 6 | Loss: 0.6049 | Val NDCG: 0.7699 | smoothed: 0.7672
+Epoch 7 | Loss: 0.6038 | Val NDCG: 0.7644 | smoothed: 0.7667
+Epoch 8 | Loss: 0.6037 | Val NDCG: 0.7697 | smoothed: 0.7680
+Epoch 9 | Loss: 0.6027 | Val NDCG: 0.7729 | smoothed: 0.7690
+Epoch 10 | Loss: 0.6018 | Val NDCG: 0.7693 | smoothed: 0.7706
+Epoch 11 | Loss: 0.6016 | Val NDCG: 0.7647 | smoothed: 0.7689
+Epoch 12 | Loss: 0.6021 | Val NDCG: 0.7679 | smoothed: 0.7673
+Epoch 13 | Loss: 0.6004 | Val NDCG: 0.7700 | smoothed: 0.7675
+Epoch 14 | Loss: 0.6009 | Val NDCG: 0.7699 | smoothed: 0.7693
+Epoch 15 | Loss: 0.6002 | Val NDCG: 0.7664 | smoothed: 0.7688
+
+Best smoothed NDCG: 0.7706 at epoch 10 of 15 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads    lr  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+          128           0.5           2          8 0.001  0.770601      0.769291          10          15          20
+
+Best config: {'hidden_units': 128.0, 'dropout_rate': 0.5, 'num_blocks': 2.0, 'num_heads': 8.0, 'lr': 0.001, 'val_ndcg': 0.7706014056967848, 'val_ndcg_raw': 0.7692911326597908, 'best_epoch': 10.0, 'epochs_run': 15.0, 'max_epochs': 20.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_pwts_best_params.json

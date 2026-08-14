@@ -1,0 +1,54 @@
+task 149 | loss pwts | node slurmnode-gpu05
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 162 combinations...
+
+SLURM array task 149: 1 config -> ../Models/sasrec_grid_pwts_task149.csv
+Trying: {'hidden_units': 256, 'dropout_rate': 0.5, 'num_blocks': 1, 'num_heads': 16, 'lr': 0.0001}
+Epoch 1 | Loss: 0.6464 | Val NDCG: 0.7351 | smoothed: 0.7351
+Epoch 2 | Loss: 0.6274 | Val NDCG: 0.7425 | smoothed: 0.7388
+Epoch 3 | Loss: 0.6213 | Val NDCG: 0.7475 | smoothed: 0.7417
+Epoch 4 | Loss: 0.6179 | Val NDCG: 0.7572 | smoothed: 0.7491
+Epoch 5 | Loss: 0.6153 | Val NDCG: 0.7585 | smoothed: 0.7544
+Epoch 6 | Loss: 0.6137 | Val NDCG: 0.7641 | smoothed: 0.7599
+Epoch 7 | Loss: 0.6126 | Val NDCG: 0.7643 | smoothed: 0.7623
+Epoch 8 | Loss: 0.6113 | Val NDCG: 0.7638 | smoothed: 0.7641
+Epoch 9 | Loss: 0.6099 | Val NDCG: 0.7657 | smoothed: 0.7646
+Epoch 10 | Loss: 0.6098 | Val NDCG: 0.7655 | smoothed: 0.7650
+Epoch 11 | Loss: 0.6081 | Val NDCG: 0.7676 | smoothed: 0.7663
+Epoch 12 | Loss: 0.6082 | Val NDCG: 0.7700 | smoothed: 0.7677
+Epoch 13 | Loss: 0.6068 | Val NDCG: 0.7700 | smoothed: 0.7692
+Epoch 14 | Loss: 0.6071 | Val NDCG: 0.7672 | smoothed: 0.7691
+Epoch 15 | Loss: 0.6065 | Val NDCG: 0.7697 | smoothed: 0.7690
+Epoch 16 | Loss: 0.6062 | Val NDCG: 0.7713 | smoothed: 0.7694
+Epoch 17 | Loss: 0.6057 | Val NDCG: 0.7708 | smoothed: 0.7706
+Epoch 18 | Loss: 0.6048 | Val NDCG: 0.7702 | smoothed: 0.7708
+Epoch 19 | Loss: 0.6050 | Val NDCG: 0.7707 | smoothed: 0.7706
+Epoch 20 | Loss: 0.6046 | Val NDCG: 0.7728 | smoothed: 0.7712
+Epoch 21 | Loss: 0.6025 | Val NDCG: 0.7708 | smoothed: 0.7714
+Epoch 22 | Loss: 0.6030 | Val NDCG: 0.7725 | smoothed: 0.7720
+Epoch 23 | Loss: 0.6030 | Val NDCG: 0.7719 | smoothed: 0.7717
+Epoch 24 | Loss: 0.6026 | Val NDCG: 0.7706 | smoothed: 0.7717
+Epoch 25 | Loss: 0.6015 | Val NDCG: 0.7722 | smoothed: 0.7716
+Epoch 26 | Loss: 0.6016 | Val NDCG: 0.7715 | smoothed: 0.7714
+Epoch 27 | Loss: 0.6017 | Val NDCG: 0.7722 | smoothed: 0.7720
+
+Best smoothed NDCG: 0.7720 at epoch 22 of 27 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads     lr  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+          256           0.5           1         16 0.0001  0.772032      0.772542          22          27          40
+
+Best config: {'hidden_units': 256.0, 'dropout_rate': 0.5, 'num_blocks': 1.0, 'num_heads': 16.0, 'lr': 0.0001, 'val_ndcg': 0.7720320683533552, 'val_ndcg_raw': 0.7725419156939488, 'best_epoch': 22.0, 'epochs_run': 27.0, 'max_epochs': 40.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_pwts_best_params.json

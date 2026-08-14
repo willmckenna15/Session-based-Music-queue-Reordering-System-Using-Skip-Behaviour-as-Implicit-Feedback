@@ -1,0 +1,37 @@
+task 175 | loss drrl | node slurmnode-gpu07
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 486 combinations...
+
+SLURM array task 175: 1 config -> ../Models/sasrec_grid_drrl_task175.csv
+Trying: {'hidden_units': 128, 'dropout_rate': 0.1, 'num_blocks': 1, 'num_heads': 16, 'lr': 0.001, 'gamma': 3}
+Epoch 1 | Loss: -0.1738 | Val NDCG: 0.7190 | smoothed: 0.7190
+Epoch 2 | Loss: -0.2226 | Val NDCG: 0.7376 | smoothed: 0.7283
+Epoch 3 | Loss: -0.2251 | Val NDCG: 0.7562 | smoothed: 0.7376
+Epoch 4 | Loss: -0.2267 | Val NDCG: 0.7542 | smoothed: 0.7494
+Epoch 5 | Loss: -0.2279 | Val NDCG: 0.7490 | smoothed: 0.7532
+Epoch 6 | Loss: -0.2276 | Val NDCG: 0.7524 | smoothed: 0.7519
+Epoch 7 | Loss: -0.2288 | Val NDCG: 0.7374 | smoothed: 0.7463
+Epoch 8 | Loss: -0.2292 | Val NDCG: 0.7522 | smoothed: 0.7473
+Epoch 9 | Loss: -0.2299 | Val NDCG: 0.7554 | smoothed: 0.7483
+Epoch 10 | Loss: -0.2300 | Val NDCG: 0.7375 | smoothed: 0.7484
+
+Best smoothed NDCG: 0.7532 at epoch 5 of 10 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads    lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+          128           0.1           1         16 0.001      3  0.753152      0.748995           5          10          20
+
+Best config: {'hidden_units': 128.0, 'dropout_rate': 0.1, 'num_blocks': 1.0, 'num_heads': 16.0, 'lr': 0.001, 'gamma': 3.0, 'val_ndcg': 0.7531518452053714, 'val_ndcg_raw': 0.7489948658630249, 'best_epoch': 5.0, 'epochs_run': 10.0, 'max_epochs': 20.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_drrl_best_params.json

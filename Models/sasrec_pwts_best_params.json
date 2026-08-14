@@ -1,1 +1,1 @@
-{"hidden_units":128.0,"dropout_rate":0.1,"num_blocks":1.0,"num_heads":4.0,"lr":0.0001,"val_ndcg":0.7741071452,"val_ndcg_raw":0.7731509641,"best_epoch":24.0,"epochs_run":29.0,"max_epochs":40.0}
+{"hidden_units":256.0,"dropout_rate":0.5,"num_blocks":3.0,"num_heads":16.0,"lr":0.0001,"val_ndcg":0.7716867295,"val_ndcg_raw":0.7703897196,"best_epoch":15.0,"epochs_run":20.0,"max_epochs":40.0}

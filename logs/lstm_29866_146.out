@@ -1,0 +1,38 @@
+task 146 | loss drrl | node slurmnode-gpu03
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Tesla P100-PCIE-16GB, 16384 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 162 combinations...
+
+SLURM array task 146: 1 config -> ../Models/LSTM_grid_drrl_task146.csv
+Trying: {'hidden_units': 256, 'dropout_rate': 0.5, 'num_layers': 1, 'lr': 0.001, 'gamma': 4}
+Epoch 1 | Loss: -0.2201 | Val NDCG: 0.7443 | smoothed: 0.7443
+Epoch 2 | Loss: -0.2287 | Val NDCG: 0.7438 | smoothed: 0.7441
+Epoch 3 | Loss: -0.2301 | Val NDCG: 0.7645 | smoothed: 0.7509
+Epoch 4 | Loss: -0.2307 | Val NDCG: 0.7763 | smoothed: 0.7615
+Epoch 5 | Loss: -0.2311 | Val NDCG: 0.7758 | smoothed: 0.7722
+Epoch 6 | Loss: -0.2312 | Val NDCG: 0.7829 | smoothed: 0.7783
+Epoch 7 | Loss: -0.2315 | Val NDCG: 0.7755 | smoothed: 0.7781
+Epoch 8 | Loss: -0.2316 | Val NDCG: 0.7757 | smoothed: 0.7780
+Epoch 9 | Loss: -0.2313 | Val NDCG: 0.7706 | smoothed: 0.7739
+Epoch 10 | Loss: -0.2315 | Val NDCG: 0.7761 | smoothed: 0.7741
+Epoch 11 | Loss: -0.2315 | Val NDCG: 0.7698 | smoothed: 0.7722
+
+Best smoothed NDCG: 0.7783 at epoch 6 of 11 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_layers    lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs  seed
+          256           0.5           1 0.001      4  0.778328      0.782949           6          11          20     0
+
+Best config: {'hidden_units': 256.0, 'dropout_rate': 0.5, 'num_layers': 1.0, 'lr': 0.001, 'gamma': 4.0, 'val_ndcg': 0.7783282730202071, 'val_ndcg_raw': 0.7829489657727022, 'best_epoch': 6.0, 'epochs_run': 11.0, 'max_epochs': 20.0, 'seed': 0.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/lstm_drrl_best_params.json

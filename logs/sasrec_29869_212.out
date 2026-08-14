@@ -1,0 +1,40 @@
+task 212 | loss drrl | node slurmnode-gpu07
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+NVIDIA A40, 46068 MiB
+Using device: cuda
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+Running grid search over 486 combinations...
+
+SLURM array task 212: 1 config -> ../Models/sasrec_grid_drrl_task212.csv
+Trying: {'hidden_units': 128, 'dropout_rate': 0.1, 'num_blocks': 3, 'num_heads': 16, 'lr': 0.001, 'gamma': 4}
+Epoch 1 | Loss: -0.1793 | Val NDCG: 0.7535 | smoothed: 0.7535
+Epoch 2 | Loss: -0.2225 | Val NDCG: 0.7491 | smoothed: 0.7513
+Epoch 3 | Loss: -0.2249 | Val NDCG: 0.7429 | smoothed: 0.7485
+Epoch 4 | Loss: -0.2275 | Val NDCG: 0.7467 | smoothed: 0.7462
+Epoch 5 | Loss: -0.2286 | Val NDCG: 0.7519 | smoothed: 0.7472
+Epoch 6 | Loss: -0.2293 | Val NDCG: 0.7673 | smoothed: 0.7553
+Epoch 7 | Loss: -0.2296 | Val NDCG: 0.7579 | smoothed: 0.7591
+Epoch 8 | Loss: -0.2296 | Val NDCG: 0.7676 | smoothed: 0.7643
+Epoch 9 | Loss: -0.2296 | Val NDCG: 0.7500 | smoothed: 0.7585
+Epoch 10 | Loss: -0.2298 | Val NDCG: 0.7567 | smoothed: 0.7581
+Epoch 11 | Loss: -0.2301 | Val NDCG: 0.7504 | smoothed: 0.7524
+Epoch 12 | Loss: -0.2303 | Val NDCG: 0.7739 | smoothed: 0.7603
+Epoch 13 | Loss: -0.2302 | Val NDCG: 0.7671 | smoothed: 0.7638
+
+Best smoothed NDCG: 0.7643 at epoch 8 of 13 run
+
+1 combinations completed out of 1
+
+
+--- Grid Search Results ---
+ hidden_units  dropout_rate  num_blocks  num_heads    lr  gamma  val_ndcg  val_ndcg_raw  best_epoch  epochs_run  max_epochs
+          128           0.1           3         16 0.001      4   0.76427      0.767554           8          13          20
+
+Best config: {'hidden_units': 128.0, 'dropout_rate': 0.1, 'num_blocks': 3.0, 'num_heads': 16.0, 'lr': 0.001, 'gamma': 4.0, 'val_ndcg': 0.7642704157442249, 'val_ndcg_raw': 0.767554410771827, 'best_epoch': 8.0, 'epochs_run': 13.0, 'max_epochs': 20.0}
+0 of 1 configs reached max_epochs
+0 of 1 were still improving when stopped
+Best params saved to ../Models/sasrec_drrl_best_params.json

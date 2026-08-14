@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/home/wmcken01/project/Model Scripts/SASRec_tuning.py", line 177, in <module>
+    train_loss = train_epoch(model, train_loader, optimizer, criterion, device,
+  File "/home/wmcken01/project/Model Scripts/Model_lib.py", line 289, in train_epoch
+    preds = model(sessions, lengths, status, boundaries)
+  File "/home/wmcken01/venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/wmcken01/venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/wmcken01/project/Model Scripts/Model_lib.py", line 238, in forward
+    feats = self.seq2feats(x, lengths, status, boundaries)
+  File "/home/wmcken01/project/Model Scripts/Model_lib.py", line 226, in seq2feats
+    mha_out, _ = self.attention_layers[i](x_, x_, x_, attn_mask=attn_mask)
+  File "/home/wmcken01/venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/wmcken01/venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/wmcken01/venv/lib/python3.10/site-packages/torch/nn/modules/activation.py", line 1223, in forward
+    attn_mask = F._canonical_mask(
+  File "/home/wmcken01/venv/lib/python3.10/site-packages/torch/nn/functional.py", line 5854, in _canonical_mask
+    mask = torch.zeros_like(mask, dtype=target_type).masked_fill_(
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 856.00 MiB. GPU 0 has a total capacity of 15.89 GiB of which 696.12 MiB is free. Process 117669 has 9.18 GiB memory in use. Including non-PyTorch memory, this process has 6.04 GiB memory in use. Of the allocated memory 4.75 GiB is allocated by PyTorch, and 1008.01 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
