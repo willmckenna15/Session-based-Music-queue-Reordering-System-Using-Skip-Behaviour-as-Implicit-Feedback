@@ -137,9 +137,13 @@ for seed in range(N_RUNS):
     runs.append(result)
     print(f"Run {seed+1}: NDCG {result['val_ndcg']:.4f} | AUC {result['val_auc']:.4f} "
           f"| best epoch {result['epoch']} of {result['epochs_run']}")
+    # every seed is kept: evaluate.py averages the test metrics over them, which is
+    # what puts error bars on the final comparison
+    torch.save(state, f'../Models/lstm_{loss_name}_seed{seed}.pt')
     if result['val_ndcg'] > best_overall[0]:
         best_overall = (result['val_ndcg'], state)
 
+# Also save the best seed under a stable name
 torch.save(best_overall[1], f'../Models/lstm_{loss_name}_best.pt')
 
 ndcgs = np.array([r['val_ndcg'] for r in runs])

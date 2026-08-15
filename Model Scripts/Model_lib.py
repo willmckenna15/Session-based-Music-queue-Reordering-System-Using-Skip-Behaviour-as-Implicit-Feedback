@@ -60,9 +60,14 @@ class SessionDataset(Dataset):
         self.ms_played = []
         self.track_length = []
         self.historical_skip_rate = []
+        # kept so evaluation can key per-session scores by identity rather than
+        # position - different scripts iterate sessions in different orders, and
+        # paired significance tests need the rows to line up
+        self.session_ids = []
 
         for session_id, session in df.groupby("session_id"):
             session = session.sort_values("ts")
+            self.session_ids.append(session_id)
             x = torch.tensor(session[features].values, dtype=torch.float32)
             y = torch.tensor(session[target].values, dtype=torch.float32)
             self.sessions.append(x)
