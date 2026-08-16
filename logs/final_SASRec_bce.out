@@ -1,0 +1,182 @@
+Using device: cuda
+Loaded best params: {'hidden_units': 256.0, 'dropout_rate': 0.1, 'num_blocks': 1.0, 'num_heads': 16.0, 'lr': 0.001, 'val_ndcg': 0.7833886533, 'val_ndcg_raw': 0.7827366125, 'best_epoch': 20.0, 'epochs_run': 20.0, 'max_epochs': 20.0}
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+=== Run 1/5 (seed 0) ===
+
+Epoch 1 | Loss: 0.5858 | NDCG: 0.7653 | smoothed: 0.7653 | AUC: 0.6072
+Epoch 2 | Loss: 0.5758 | NDCG: 0.7664 | smoothed: 0.7659 | AUC: 0.6112
+Epoch 3 | Loss: 0.5737 | NDCG: 0.7711 | smoothed: 0.7676 | AUC: 0.6154
+Epoch 4 | Loss: 0.5714 | NDCG: 0.7733 | smoothed: 0.7703 | AUC: 0.6199
+Epoch 5 | Loss: 0.5696 | NDCG: 0.7705 | smoothed: 0.7716 | AUC: 0.6163
+Epoch 6 | Loss: 0.5677 | NDCG: 0.7744 | smoothed: 0.7727 | AUC: 0.6205
+Epoch 7 | Loss: 0.5677 | NDCG: 0.7761 | smoothed: 0.7737 | AUC: 0.6223
+Epoch 8 | Loss: 0.5676 | NDCG: 0.7713 | smoothed: 0.7740 | AUC: 0.6154
+Epoch 9 | Loss: 0.5651 | NDCG: 0.7762 | smoothed: 0.7746 | AUC: 0.6216
+Epoch 10 | Loss: 0.5664 | NDCG: 0.7733 | smoothed: 0.7736 | AUC: 0.6168
+Epoch 11 | Loss: 0.5658 | NDCG: 0.7756 | smoothed: 0.7751 | AUC: 0.6207
+Epoch 12 | Loss: 0.5647 | NDCG: 0.7786 | smoothed: 0.7759 | AUC: 0.6259
+Epoch 13 | Loss: 0.5643 | NDCG: 0.7784 | smoothed: 0.7776 | AUC: 0.6259
+Epoch 14 | Loss: 0.5637 | NDCG: 0.7802 | smoothed: 0.7791 | AUC: 0.6245
+Epoch 15 | Loss: 0.5638 | NDCG: 0.7794 | smoothed: 0.7794 | AUC: 0.6258
+Epoch 16 | Loss: 0.5614 | NDCG: 0.7785 | smoothed: 0.7794 | AUC: 0.6258
+Epoch 17 | Loss: 0.5626 | NDCG: 0.7821 | smoothed: 0.7800 | AUC: 0.6302
+Epoch 18 | Loss: 0.5611 | NDCG: 0.7820 | smoothed: 0.7809 | AUC: 0.6303
+Epoch 19 | Loss: 0.5615 | NDCG: 0.7815 | smoothed: 0.7819 | AUC: 0.6272
+Epoch 20 | Loss: 0.5616 | NDCG: 0.7777 | smoothed: 0.7804 | AUC: 0.6229
+Epoch 21 | Loss: 0.5613 | NDCG: 0.7846 | smoothed: 0.7813 | AUC: 0.6336
+Epoch 22 | Loss: 0.5607 | NDCG: 0.7839 | smoothed: 0.7821 | AUC: 0.6321
+Epoch 23 | Loss: 0.5595 | NDCG: 0.7820 | smoothed: 0.7835 | AUC: 0.6284
+Epoch 24 | Loss: 0.5606 | NDCG: 0.7852 | smoothed: 0.7837 | AUC: 0.6352
+Epoch 25 | Loss: 0.5593 | NDCG: 0.7855 | smoothed: 0.7842 | AUC: 0.6334
+Epoch 26 | Loss: 0.5582 | NDCG: 0.7839 | smoothed: 0.7849 | AUC: 0.6317
+Epoch 27 | Loss: 0.5583 | NDCG: 0.7838 | smoothed: 0.7844 | AUC: 0.6339
+Epoch 28 | Loss: 0.5578 | NDCG: 0.7869 | smoothed: 0.7849 | AUC: 0.6354
+Epoch 29 | Loss: 0.5581 | NDCG: 0.7864 | smoothed: 0.7857 | AUC: 0.6381
+Epoch 30 | Loss: 0.5572 | NDCG: 0.7868 | smoothed: 0.7867 | AUC: 0.6350
+Epoch 31 | Loss: 0.5557 | NDCG: 0.7836 | smoothed: 0.7856 | AUC: 0.6354
+Epoch 32 | Loss: 0.5567 | NDCG: 0.7837 | smoothed: 0.7847 | AUC: 0.6320
+Epoch 33 | Loss: 0.5566 | NDCG: 0.7866 | smoothed: 0.7846 | AUC: 0.6375
+Epoch 34 | Loss: 0.5565 | NDCG: 0.7893 | smoothed: 0.7865 | AUC: 0.6415
+Epoch 35 | Loss: 0.5559 | NDCG: 0.7861 | smoothed: 0.7873 | AUC: 0.6330
+Epoch 36 | Loss: 0.5564 | NDCG: 0.7858 | smoothed: 0.7871 | AUC: 0.6340
+Epoch 37 | Loss: 0.5561 | NDCG: 0.7855 | smoothed: 0.7858 | AUC: 0.6346
+Epoch 38 | Loss: 0.5556 | NDCG: 0.7869 | smoothed: 0.7861 | AUC: 0.6364
+Epoch 39 | Loss: 0.5554 | NDCG: 0.7881 | smoothed: 0.7868 | AUC: 0.6378
+Epoch 40 | Loss: 0.5553 | NDCG: 0.7872 | smoothed: 0.7874 | AUC: 0.6368
+Epoch 41 | Loss: 0.5548 | NDCG: 0.7843 | smoothed: 0.7866 | AUC: 0.6333
+Epoch 42 | Loss: 0.5554 | NDCG: 0.7882 | smoothed: 0.7866 | AUC: 0.6376
+Epoch 43 | Loss: 0.5553 | NDCG: 0.7861 | smoothed: 0.7862 | AUC: 0.6347
+Epoch 44 | Loss: 0.5547 | NDCG: 0.7864 | smoothed: 0.7869 | AUC: 0.6359
+Epoch 45 | Loss: 0.5549 | NDCG: 0.7874 | smoothed: 0.7867 | AUC: 0.6347
+Early stopping at epoch 45
+Run 1: NDCG 0.7874 | AUC 0.6368 | best epoch 40 of 45
+
+=== Run 2/5 (seed 1) ===
+
+Epoch 1 | Loss: 0.5875 | NDCG: 0.7645 | smoothed: 0.7645 | AUC: 0.6091
+Epoch 2 | Loss: 0.5782 | NDCG: 0.7669 | smoothed: 0.7657 | AUC: 0.6135
+Epoch 3 | Loss: 0.5725 | NDCG: 0.7731 | smoothed: 0.7682 | AUC: 0.6208
+Epoch 4 | Loss: 0.5730 | NDCG: 0.7706 | smoothed: 0.7702 | AUC: 0.6145
+Epoch 5 | Loss: 0.5706 | NDCG: 0.7703 | smoothed: 0.7713 | AUC: 0.6121
+Epoch 6 | Loss: 0.5695 | NDCG: 0.7710 | smoothed: 0.7706 | AUC: 0.6146
+Epoch 7 | Loss: 0.5687 | NDCG: 0.7700 | smoothed: 0.7704 | AUC: 0.6144
+Epoch 8 | Loss: 0.5671 | NDCG: 0.7774 | smoothed: 0.7728 | AUC: 0.6242
+Epoch 9 | Loss: 0.5666 | NDCG: 0.7740 | smoothed: 0.7738 | AUC: 0.6218
+Epoch 10 | Loss: 0.5670 | NDCG: 0.7770 | smoothed: 0.7761 | AUC: 0.6263
+Epoch 11 | Loss: 0.5656 | NDCG: 0.7792 | smoothed: 0.7767 | AUC: 0.6251
+Epoch 12 | Loss: 0.5653 | NDCG: 0.7738 | smoothed: 0.7766 | AUC: 0.6185
+Epoch 13 | Loss: 0.5649 | NDCG: 0.7797 | smoothed: 0.7775 | AUC: 0.6256
+Epoch 14 | Loss: 0.5638 | NDCG: 0.7767 | smoothed: 0.7767 | AUC: 0.6238
+Epoch 15 | Loss: 0.5638 | NDCG: 0.7820 | smoothed: 0.7795 | AUC: 0.6301
+Epoch 16 | Loss: 0.5637 | NDCG: 0.7797 | smoothed: 0.7794 | AUC: 0.6281
+Epoch 17 | Loss: 0.5626 | NDCG: 0.7787 | smoothed: 0.7801 | AUC: 0.6258
+Epoch 18 | Loss: 0.5613 | NDCG: 0.7815 | smoothed: 0.7799 | AUC: 0.6313
+Epoch 19 | Loss: 0.5611 | NDCG: 0.7820 | smoothed: 0.7807 | AUC: 0.6322
+Epoch 20 | Loss: 0.5597 | NDCG: 0.7798 | smoothed: 0.7811 | AUC: 0.6258
+Epoch 21 | Loss: 0.5608 | NDCG: 0.7826 | smoothed: 0.7815 | AUC: 0.6312
+Epoch 22 | Loss: 0.5603 | NDCG: 0.7824 | smoothed: 0.7816 | AUC: 0.6306
+Epoch 23 | Loss: 0.5597 | NDCG: 0.7831 | smoothed: 0.7827 | AUC: 0.6329
+Epoch 24 | Loss: 0.5591 | NDCG: 0.7821 | smoothed: 0.7825 | AUC: 0.6292
+Epoch 25 | Loss: 0.5593 | NDCG: 0.7828 | smoothed: 0.7826 | AUC: 0.6307
+Epoch 26 | Loss: 0.5595 | NDCG: 0.7828 | smoothed: 0.7825 | AUC: 0.6300
+Epoch 27 | Loss: 0.5591 | NDCG: 0.7859 | smoothed: 0.7838 | AUC: 0.6366
+Epoch 28 | Loss: 0.5582 | NDCG: 0.7824 | smoothed: 0.7837 | AUC: 0.6295
+Epoch 29 | Loss: 0.5572 | NDCG: 0.7840 | smoothed: 0.7841 | AUC: 0.6322
+Epoch 30 | Loss: 0.5578 | NDCG: 0.7839 | smoothed: 0.7834 | AUC: 0.6331
+Epoch 31 | Loss: 0.5575 | NDCG: 0.7835 | smoothed: 0.7838 | AUC: 0.6317
+Epoch 32 | Loss: 0.5565 | NDCG: 0.7854 | smoothed: 0.7843 | AUC: 0.6339
+Epoch 33 | Loss: 0.5577 | NDCG: 0.7871 | smoothed: 0.7853 | AUC: 0.6369
+Epoch 34 | Loss: 0.5566 | NDCG: 0.7831 | smoothed: 0.7852 | AUC: 0.6321
+Epoch 35 | Loss: 0.5571 | NDCG: 0.7841 | smoothed: 0.7848 | AUC: 0.6311
+Epoch 36 | Loss: 0.5566 | NDCG: 0.7833 | smoothed: 0.7835 | AUC: 0.6334
+Epoch 37 | Loss: 0.5555 | NDCG: 0.7855 | smoothed: 0.7843 | AUC: 0.6332
+Epoch 38 | Loss: 0.5563 | NDCG: 0.7879 | smoothed: 0.7856 | AUC: 0.6374
+Epoch 39 | Loss: 0.5552 | NDCG: 0.7853 | smoothed: 0.7862 | AUC: 0.6359
+Epoch 40 | Loss: 0.5553 | NDCG: 0.7844 | smoothed: 0.7859 | AUC: 0.6326
+Epoch 41 | Loss: 0.5548 | NDCG: 0.7856 | smoothed: 0.7851 | AUC: 0.6341
+Epoch 42 | Loss: 0.5553 | NDCG: 0.7867 | smoothed: 0.7856 | AUC: 0.6369
+Epoch 43 | Loss: 0.5542 | NDCG: 0.7837 | smoothed: 0.7853 | AUC: 0.6315
+Epoch 44 | Loss: 0.5554 | NDCG: 0.7859 | smoothed: 0.7854 | AUC: 0.6356
+Early stopping at epoch 44
+Run 2: NDCG 0.7862 | AUC 0.6359 | best epoch 39 of 44
+
+=== Run 3/5 (seed 2) ===
+
+Epoch 1 | Loss: 0.5879 | NDCG: 0.7663 | smoothed: 0.7663 | AUC: 0.6087
+Epoch 2 | Loss: 0.5772 | NDCG: 0.7652 | smoothed: 0.7657 | AUC: 0.6090
+Epoch 3 | Loss: 0.5748 | NDCG: 0.7687 | smoothed: 0.7667 | AUC: 0.6150
+Epoch 4 | Loss: 0.5735 | NDCG: 0.7677 | smoothed: 0.7672 | AUC: 0.6135
+Epoch 5 | Loss: 0.5705 | NDCG: 0.7740 | smoothed: 0.7701 | AUC: 0.6188
+Epoch 6 | Loss: 0.5700 | NDCG: 0.7715 | smoothed: 0.7711 | AUC: 0.6162
+Epoch 7 | Loss: 0.5682 | NDCG: 0.7713 | smoothed: 0.7723 | AUC: 0.6152
+Epoch 8 | Loss: 0.5679 | NDCG: 0.7762 | smoothed: 0.7730 | AUC: 0.6228
+Epoch 9 | Loss: 0.5673 | NDCG: 0.7736 | smoothed: 0.7737 | AUC: 0.6209
+Epoch 10 | Loss: 0.5659 | NDCG: 0.7771 | smoothed: 0.7756 | AUC: 0.6239
+Epoch 11 | Loss: 0.5658 | NDCG: 0.7736 | smoothed: 0.7748 | AUC: 0.6174
+Epoch 12 | Loss: 0.5655 | NDCG: 0.7749 | smoothed: 0.7752 | AUC: 0.6219
+Epoch 13 | Loss: 0.5652 | NDCG: 0.7766 | smoothed: 0.7751 | AUC: 0.6230
+Epoch 14 | Loss: 0.5643 | NDCG: 0.7775 | smoothed: 0.7764 | AUC: 0.6238
+Epoch 15 | Loss: 0.5632 | NDCG: 0.7794 | smoothed: 0.7779 | AUC: 0.6260
+Epoch 16 | Loss: 0.5625 | NDCG: 0.7825 | smoothed: 0.7798 | AUC: 0.6331
+Epoch 17 | Loss: 0.5625 | NDCG: 0.7806 | smoothed: 0.7808 | AUC: 0.6291
+Epoch 18 | Loss: 0.5622 | NDCG: 0.7778 | smoothed: 0.7803 | AUC: 0.6235
+Epoch 19 | Loss: 0.5620 | NDCG: 0.7805 | smoothed: 0.7797 | AUC: 0.6308
+Epoch 20 | Loss: 0.5607 | NDCG: 0.7806 | smoothed: 0.7796 | AUC: 0.6286
+Epoch 21 | Loss: 0.5614 | NDCG: 0.7810 | smoothed: 0.7807 | AUC: 0.6302
+Epoch 22 | Loss: 0.5605 | NDCG: 0.7797 | smoothed: 0.7804 | AUC: 0.6290
+Early stopping at epoch 22
+Run 3: NDCG 0.7808 | AUC 0.6291 | best epoch 17 of 22
+
+=== Run 4/5 (seed 3) ===
+
+Epoch 1 | Loss: 0.5863 | NDCG: 0.7652 | smoothed: 0.7652 | AUC: 0.6098
+Epoch 2 | Loss: 0.5772 | NDCG: 0.7654 | smoothed: 0.7653 | AUC: 0.6044
+Epoch 3 | Loss: 0.5749 | NDCG: 0.7739 | smoothed: 0.7682 | AUC: 0.6189
+Epoch 4 | Loss: 0.5728 | NDCG: 0.7709 | smoothed: 0.7701 | AUC: 0.6129
+Epoch 5 | Loss: 0.5709 | NDCG: 0.7721 | smoothed: 0.7723 | AUC: 0.6197
+Epoch 6 | Loss: 0.5692 | NDCG: 0.7733 | smoothed: 0.7721 | AUC: 0.6188
+Epoch 7 | Loss: 0.5685 | NDCG: 0.7763 | smoothed: 0.7739 | AUC: 0.6250
+Epoch 8 | Loss: 0.5679 | NDCG: 0.7784 | smoothed: 0.7760 | AUC: 0.6279
+Epoch 9 | Loss: 0.5676 | NDCG: 0.7779 | smoothed: 0.7775 | AUC: 0.6251
+Epoch 10 | Loss: 0.5668 | NDCG: 0.7782 | smoothed: 0.7782 | AUC: 0.6273
+Epoch 11 | Loss: 0.5658 | NDCG: 0.7766 | smoothed: 0.7776 | AUC: 0.6249
+Epoch 12 | Loss: 0.5647 | NDCG: 0.7792 | smoothed: 0.7780 | AUC: 0.6280
+Epoch 13 | Loss: 0.5639 | NDCG: 0.7760 | smoothed: 0.7773 | AUC: 0.6198
+Epoch 14 | Loss: 0.5630 | NDCG: 0.7770 | smoothed: 0.7774 | AUC: 0.6257
+Epoch 15 | Loss: 0.5630 | NDCG: 0.7803 | smoothed: 0.7778 | AUC: 0.6269
+Early stopping at epoch 15
+Run 4: NDCG 0.7782 | AUC 0.6273 | best epoch 10 of 15
+
+=== Run 5/5 (seed 4) ===
+
+Epoch 1 | Loss: 0.5882 | NDCG: 0.7602 | smoothed: 0.7602 | AUC: 0.6032
+Epoch 2 | Loss: 0.5769 | NDCG: 0.7662 | smoothed: 0.7632 | AUC: 0.6116
+Epoch 3 | Loss: 0.5738 | NDCG: 0.7682 | smoothed: 0.7649 | AUC: 0.6135
+Epoch 4 | Loss: 0.5723 | NDCG: 0.7711 | smoothed: 0.7685 | AUC: 0.6152
+Epoch 5 | Loss: 0.5703 | NDCG: 0.7679 | smoothed: 0.7691 | AUC: 0.6072
+Epoch 6 | Loss: 0.5700 | NDCG: 0.7751 | smoothed: 0.7714 | AUC: 0.6204
+Epoch 7 | Loss: 0.5684 | NDCG: 0.7731 | smoothed: 0.7720 | AUC: 0.6193
+Epoch 8 | Loss: 0.5674 | NDCG: 0.7747 | smoothed: 0.7743 | AUC: 0.6198
+Epoch 9 | Loss: 0.5666 | NDCG: 0.7753 | smoothed: 0.7744 | AUC: 0.6199
+Epoch 10 | Loss: 0.5652 | NDCG: 0.7783 | smoothed: 0.7761 | AUC: 0.6247
+Epoch 11 | Loss: 0.5648 | NDCG: 0.7795 | smoothed: 0.7777 | AUC: 0.6267
+Epoch 12 | Loss: 0.5653 | NDCG: 0.7805 | smoothed: 0.7794 | AUC: 0.6299
+Epoch 13 | Loss: 0.5640 | NDCG: 0.7776 | smoothed: 0.7792 | AUC: 0.6234
+Epoch 14 | Loss: 0.5632 | NDCG: 0.7809 | smoothed: 0.7797 | AUC: 0.6278
+Epoch 15 | Loss: 0.5634 | NDCG: 0.7802 | smoothed: 0.7796 | AUC: 0.6289
+Epoch 16 | Loss: 0.5614 | NDCG: 0.7810 | smoothed: 0.7807 | AUC: 0.6303
+Epoch 17 | Loss: 0.5615 | NDCG: 0.7804 | smoothed: 0.7805 | AUC: 0.6275
+Epoch 18 | Loss: 0.5610 | NDCG: 0.7789 | smoothed: 0.7801 | AUC: 0.6274
+Epoch 19 | Loss: 0.5605 | NDCG: 0.7796 | smoothed: 0.7796 | AUC: 0.6286
+Epoch 20 | Loss: 0.5612 | NDCG: 0.7811 | smoothed: 0.7799 | AUC: 0.6303
+Epoch 21 | Loss: 0.5603 | NDCG: 0.7803 | smoothed: 0.7803 | AUC: 0.6297
+Early stopping at epoch 21
+Run 5: NDCG 0.7807 | AUC 0.6303 | best epoch 16 of 21
+
+=== SASRec / BCE across 5 seeds ===
+NDCG@5 : 0.7827 +/- 0.0035   [0.7874, 0.7862, 0.7808, 0.7782, 0.7807]
+AUC    : 0.6319 +/- 0.0038   [0.6368, 0.6359, 0.6291, 0.6273, 0.6303]
+epochs : [45, 44, 22, 15, 21]  (best at [40, 39, 17, 10, 16])
+Model saved to ../Models/sasrec_bce_best.pt
