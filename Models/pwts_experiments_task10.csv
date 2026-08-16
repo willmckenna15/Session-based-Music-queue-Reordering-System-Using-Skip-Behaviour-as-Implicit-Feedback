@@ -1,0 +1,2 @@
+variant,position,time,historical,decay,start,thresh,mid,steep,changed_from_default,n_seeds,val_ndcg_mean,val_ndcg_std,val_auc_mean,val_auc_std,epochs_run,best_epoch,timestamp
+steep_3,True,True,True,3.0,2.0,0.1,0.5,3.0,"{""steep"": 3.0}",3,0.7925,0.0013,0.6413,0.0027,"[32, 23, 22]","[27, 18, 17]",2026-08-16 19:00:40.211961

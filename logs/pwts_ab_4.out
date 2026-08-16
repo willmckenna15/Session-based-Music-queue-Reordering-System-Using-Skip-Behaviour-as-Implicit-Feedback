@@ -1,0 +1,13 @@
+SLURM array task 4: variant 'decay_1' -> ../Models/pwts_experiments_task4.csv
+Using device: cuda
+SkipLSTM config: {'hidden_units': 128.0, 'dropout_rate': 0.3, 'num_layers': 1.0, 'lr': 0.001, 'val_ndcg': 0.7936747196, 'val_ndcg_raw': 0.7929467621, 'best_epoch': 18.0, 'epochs_run': 20.0, 'max_epochs': 20.0, 'seed': 0.0}
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+=== decay_1  {'decay': 1.0} ===
+  seed 0: NDCG 0.7837 | AUC 0.6437 | best epoch 2 of 7
+  seed 1: NDCG 0.7922 | AUC 0.6429 | best epoch 29 of 34
+  seed 2: NDCG 0.7925 | AUC 0.6423 | best epoch 17 of 22
+  -> NDCG 0.7895 +/- 0.0041 | AUC 0.6430 +/- 0.0006
+
+Written to ../Models/pwts_experiments_task4.csv

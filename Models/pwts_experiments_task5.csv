@@ -1,0 +1,2 @@
+variant,position,time,historical,decay,start,thresh,mid,steep,changed_from_default,n_seeds,val_ndcg_mean,val_ndcg_std,val_auc_mean,val_auc_std,epochs_run,best_epoch,timestamp
+decay_5,True,True,True,5.0,2.0,0.1,0.5,6.0,"{""decay"": 5.0}",3,0.793,0.0008,0.6446,0.004,"[21, 23, 22]","[16, 18, 17]",2026-08-16 19:21:53.847237

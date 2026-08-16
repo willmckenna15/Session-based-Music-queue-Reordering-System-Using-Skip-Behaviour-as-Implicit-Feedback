@@ -1,0 +1,13 @@
+SLURM array task 7: variant 'start_6' -> ../Models/pwts_experiments_task7.csv
+Using device: cuda
+SkipLSTM config: {'hidden_units': 128.0, 'dropout_rate': 0.3, 'num_layers': 1.0, 'lr': 0.001, 'val_ndcg': 0.7936747196, 'val_ndcg_raw': 0.7929467621, 'best_epoch': 18.0, 'epochs_run': 20.0, 'max_epochs': 20.0, 'seed': 0.0}
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+=== start_6  {'start': 6} ===
+  seed 0: NDCG 0.7823 | AUC 0.6372 | best epoch 4 of 9
+  seed 1: NDCG 0.7831 | AUC 0.6266 | best epoch 10 of 15
+  seed 2: NDCG 0.7866 | AUC 0.6375 | best epoch 12 of 17
+  -> NDCG 0.7840 +/- 0.0019 | AUC 0.6338 +/- 0.0050
+
+Written to ../Models/pwts_experiments_task7.csv
