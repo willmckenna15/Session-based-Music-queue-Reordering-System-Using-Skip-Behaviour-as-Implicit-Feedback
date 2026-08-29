@@ -1,0 +1,13 @@
+SLURM array task 10: variant 'steep_3' -> ../Models/pwts_experiments_task10.csv
+Using device: cuda
+SkipLSTM config: {'hidden_units': 128.0, 'dropout_rate': 0.3, 'num_layers': 1.0, 'lr': 0.001, 'val_ndcg': 0.7936747196, 'val_ndcg_raw': 0.7929467621, 'best_epoch': 18.0, 'epochs_run': 20.0, 'max_epochs': 20.0, 'seed': 0.0}
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+=== steep_3  {'steep': 3.0} ===
+  seed 0: NDCG 0.7928 | AUC 0.6415 | best epoch 21 of 26
+  seed 1: NDCG 0.7909 | AUC 0.6379 | best epoch 14 of 20
+  seed 2: NDCG 0.7937 | AUC 0.6495 | best epoch 16 of 21
+  -> NDCG 0.7925 +/- 0.0012 | AUC 0.6430 +/- 0.0048
+
+Written to ../Models/pwts_experiments_task10.csv

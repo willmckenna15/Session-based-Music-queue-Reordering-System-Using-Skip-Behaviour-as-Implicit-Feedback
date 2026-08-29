@@ -1,2 +1,2 @@
 variant,position,time,historical,decay,start,thresh,mid,steep,changed_from_default,n_seeds,val_ndcg_mean,val_ndcg_std,val_auc_mean,val_auc_std,epochs_run,best_epoch,timestamp
-no_historical,True,True,False,3.0,2.0,0.1,0.5,6.0,"{""historical"": false}",3,0.7932,0.0015,0.6436,0.003,"[27, 15, 22]","[22, 10, 17]",2026-08-16 19:17:35.856291
+no_historical,True,True,False,3.0,2.0,0.1,0.5,6.0,"{""historical"": false}",3,0.7929,0.0008,0.642,0.0019,"[23, 23, 30]","[18, 18, 25]",2026-08-29 15:17:08.939584

@@ -1,0 +1,13 @@
+SLURM array task 9: variant 'thresh_0.2' -> ../Models/pwts_experiments_task9.csv
+Using device: cuda
+SkipLSTM config: {'hidden_units': 128.0, 'dropout_rate': 0.3, 'num_layers': 1.0, 'lr': 0.001, 'val_ndcg': 0.7936747196, 'val_ndcg_raw': 0.7929467621, 'best_epoch': 18.0, 'epochs_run': 20.0, 'max_epochs': 20.0, 'seed': 0.0}
+Loading datasets...
+Train sessions: 75875 | Val sessions: 16262
+
+=== thresh_0.2  {'thresh': 0.2} ===
+  seed 0: NDCG 0.7923 | AUC 0.6482 | best epoch 19 of 24
+  seed 1: NDCG 0.7936 | AUC 0.6427 | best epoch 29 of 34
+  seed 2: NDCG 0.7930 | AUC 0.6499 | best epoch 12 of 20
+  -> NDCG 0.7930 +/- 0.0005 | AUC 0.6469 +/- 0.0031
+
+Written to ../Models/pwts_experiments_task9.csv
