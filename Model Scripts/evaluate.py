@@ -276,14 +276,25 @@ for kind in ('SASRec', 'SkipLSTM'):
             print(f"skip {kind}/{loss}: no checkpoint")
             continue
         print(f"{kind}/{loss}: {len(models)} checkpoint(s)")
-        seed_means, last = [], None
+        # Per-session scores are accumulated across seeds, not taken from the last
+        # one: the table reports the seed mean, so the arrays a paired test runs on
+        # have to be the seed mean too or the test is not testing the table.
+        seed_means, acc, acc_keys = [], None, None
         for label, m in models:
             means, arrays, keys = eval_neural(m)
             seed_means.append(means)
-            last = (arrays, keys)
+            if acc is None:
+                acc, acc_keys = {k: v.copy() for k, v in arrays.items()}, keys
+            else:
+                if keys != acc_keys:
+                    raise RuntimeError(f'{kind}/{loss}: seed {label} scored a '
+                                       f'different session set - cannot average')
+                for k in acc:
+                    acc[k] += arrays[k]
+        acc = {k: v / len(models) for k, v in acc.items()}
         avg = {k: float(np.mean([s[k] for s in seed_means])) for k in METRICS}
         sd = {k: float(np.std([s[k] for s in seed_means])) for k in METRICS}
-        record(f'{kind}/{loss}', avg, last[0], last[1], len(models), sd)
+        record(f'{kind}/{loss}', avg, acc, acc_keys, len(models), sd)
 
 if not opts.no_baselines:
     for name, preds in baseline_predictions().items():
