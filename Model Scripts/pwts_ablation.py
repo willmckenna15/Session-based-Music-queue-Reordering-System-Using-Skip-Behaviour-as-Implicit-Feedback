@@ -25,6 +25,14 @@ PATIENCE = 5
 SMOOTH_WINDOW = 3
 N_SEEDS = 3            # fewer than the 5 used for headline results - this is a
                        # within-ablation comparison, and there are 15 variants
+MIN_EPOCHS = 20        # Early stopping is not allowed to fire before this. In the
+                       # first run the variant ranking was perfectly separated by
+                       # training length - the top 7 variants were exactly the 7
+                       # whose seeds all ran >=15 epochs, the bottom 8 exactly the 8
+                       # with a seed stopping at 7 or 9 - so the table ranked when
+                       # patience happened to trigger rather than the loss constants.
+                       # Well-behaved variants peaked between epochs 10 and 35, so a
+                       # floor of 20 clears the artefact without capping convergence.
 
 OUT = '../Models/pwts_experiments.csv'
 TASK_ID = int(os.environ.get('SLURM_ARRAY_TASK_ID', -1))
@@ -190,7 +198,7 @@ def run_one(config, seed):
             patience = 0
         else:
             patience += 1
-            if patience >= PATIENCE:
+            if patience >= PATIENCE and epoch + 1 >= MIN_EPOCHS:
                 break
     return best_smoothed, best_auc, best_epoch, len(history)
 
