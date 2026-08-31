@@ -1,0 +1,10 @@
+model,feature_set,n_features,pooled_auc,session_auc,session_ndcg5,n_sessions,split,timestamp,loss,experiment,n_seeds,val_ndcg_mean,val_ndcg_std,val_auc_mean,val_auc_std,epochs_run,best_epoch,params
+LogReg,audio-only,10,0.506,0.5068,0.6963,12011.0,validation,2026-08-29 14:31:52.397245,,,,,,,,,,
+LogReg,behavioural-only,5,0.7082,0.5916,0.7531,12014.0,validation,2026-08-29 14:31:57.525147,,,,,,,,,,
+LogReg,all,15,0.7081,0.5942,0.7584,12011.0,validation,2026-08-29 14:32:03.374730,,,,,,,,,,
+ExtraTrees,audio-only,10,0.5499,0.5038,0.6938,12011.0,validation,2026-08-29 14:40:02.463732,,,,,,,,,,
+ExtraTrees,behavioural-only,5,0.7201,0.6051,0.7707,12014.0,validation,2026-08-29 14:40:20.961088,,,,,,,,,,
+ExtraTrees,all,15,0.7159,0.6029,0.7691,12011.0,validation,2026-08-29 14:40:42.028752,,,,,,,,,,
+SkipLSTM,audio-only,10,,0.5779,0.7368,,validation,2026-08-29 15:46:06.964611,pwts,unnamed,5.0,0.7368,0.0053,0.5779,0.0137,"[9, 9, 9, 36, 11]","[4, 4, 4, 31, 6]","{""hidden_units"": 128.0, ""dropout_rate"": 0.3, ""num_layers"": 1.0, ""lr"": 0.001}"
+SkipLSTM,behavioural-only,5,,0.6464,0.7937,,validation,2026-08-29 18:33:47.191622,pwts,unnamed,5.0,0.7937,0.0006,0.6464,0.003,"[18, 32, 17, 25, 20]","[13, 27, 12, 20, 15]","{""hidden_units"": 128.0, ""dropout_rate"": 0.3, ""num_layers"": 1.0, ""lr"": 0.001}"
+SkipLSTM,all,15,,0.6411,0.7904,,validation,2026-08-29 21:50:14.379961,pwts,unnamed,5.0,0.7904,0.0034,0.6411,0.0026,"[7, 15, 30, 27, 29]","[2, 10, 25, 22, 24]","{""hidden_units"": 128.0, ""dropout_rate"": 0.3, ""num_layers"": 1.0, ""lr"": 0.001}"

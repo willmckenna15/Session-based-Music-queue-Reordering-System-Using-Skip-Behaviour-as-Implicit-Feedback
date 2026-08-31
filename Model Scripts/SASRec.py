@@ -19,10 +19,26 @@ import json
 import copy
 from Loss_functions import get_loss_criterion, parse_args, DrRLLoss, PWTSLoss
 
-features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
-            'acousticness', 'instrumentalness', 'liveness', 'valence',
-            'historical_skip_rate',
-            'historical_artist_skip_rate', 'shuffle', 'is_repeat_track', 'same_artist_as_prev']
+_fs = argparse.ArgumentParser(add_help=False)
+_fs.add_argument('--feature-set', type=str, default=None,
+                 choices=['audio-only', 'behavioural-only', 'all'],
+                 help='Which features to use (feature ablation)')
+_requested = _fs.parse_known_args()[0].feature_set
+is_ablation = _requested is not None          # an ordinary run passes nothing
+feature_set = _requested or 'all'
+
+audio_features = ['tempo', 'mode', 'danceability', 'energy', 'loudness',
+                  'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence']
+
+behavioural_features = ['historical_skip_rate', 'historical_artist_skip_rate',
+                        'shuffle', 'is_repeat_track', 'same_artist_as_prev']
+
+if feature_set == 'audio-only':
+    features = audio_features
+elif feature_set == 'behavioural-only':
+    features = behavioural_features
+else:
+    features = audio_features + behavioural_features
 target = 'skipped'
 
 BATCH_SIZE = 64
@@ -51,6 +67,17 @@ with open(params_path, 'r') as f:
     best_params = json.load(f)
 
 print(f"Loaded best params: {best_params}")
+print(f"Feature set: {feature_set} ({len(features)} features)")
+
+# Any run that passes --feature-set writes tagged checkpoints, including
+# --feature-set all. Keying the tag on the value instead would let an "all" run
+# write to the untagged paths and overwrite the headline models evaluate.py reads.
+TAG = f'_{feature_set.replace("-", "")}' if is_ablation else ''
+
+# NOTE for interpretation: the status channel (status_emb) carries observed skip
+# outcomes and is NOT part of `features`, so an "audio-only" model here still
+# receives skip momentum. It is not audio-only in the sense the sklearn baselines
+# are - those are the clean test of the research question.
 
 print("Loading datasets...")
 train_dataset = SessionDataset('../RAW Data/training_data.parquet', features, target)
@@ -152,12 +179,12 @@ for seed in range(N_RUNS):
           f"| best epoch {result['epoch']} of {result['epochs_run']}")
     # every seed is kept: evaluate.py averages the test metrics over them, which is
     # what puts error bars on the final comparison
-    torch.save(state, f'../Models/sasrec_{loss_name}_seed{seed}.pt')
+    torch.save(state, f'../Models/sasrec_{loss_name}{TAG}_seed{seed}.pt')
     if result['val_ndcg'] > best_overall[0]:
         best_overall = (result['val_ndcg'], state)
 
 # Also save the best seed under a stable name
-torch.save(best_overall[1], f'../Models/sasrec_{loss_name}_best.pt')
+torch.save(best_overall[1], f'../Models/sasrec_{loss_name}{TAG}_best.pt')
 
 ndcgs = np.array([r['val_ndcg'] for r in runs])
 aucs = np.array([r['val_auc'] for r in runs])
@@ -166,10 +193,18 @@ print(f"\n=== SASRec / {loss_name.upper()} across {N_RUNS} seeds ===")
 print(f"NDCG@5 : {ndcgs.mean():.4f} +/- {ndcgs.std():.4f}   {np.round(ndcgs, 4).tolist()}")
 print(f"AUC    : {aucs.mean():.4f} +/- {aucs.std():.4f}   {np.round(aucs, 4).tolist()}")
 print(f"epochs : {[r['epochs_run'] for r in runs]}  (best at {[r['epoch'] for r in runs]})")
-print(f"Model saved to ../Models/sasrec_{loss_name}_best.pt")
+print(f"Model saved to ../Models/sasrec_{loss_name}{TAG}_best.pt")
+
+LOG = ('../Models/feature_ablation_study.csv' if is_ablation
+       else '../Models/test_log.csv')
 
 log_test({
     'model': 'SASRec',
+    'feature_set': feature_set,
+    'n_features': len(features),
+    'session_auc': round(float(aucs.mean()), 4),
+    'session_ndcg5': round(float(ndcgs.mean()), 4),
+    'split': 'validation',
     'loss': loss_name,
     'experiment': args.experiment,
     'n_seeds': N_RUNS,
@@ -182,4 +217,4 @@ log_test({
     'params': json.dumps({k: best_params[k] for k in
                           ('hidden_units', 'dropout_rate', 'num_blocks', 'num_heads', 'lr')
                           if k in best_params}),
-})
+}, log_path=LOG)

@@ -1,4 +1,4 @@
-import Project_Json2csv
+import Json2csv
 import audio_features_clean
 import session_compiler
 import dataset_splitter
@@ -21,7 +21,7 @@ for f in stale:
 print("Pre-existing files removed")
 
 print("\033[1;4m\nCombining RAW Datasets\033[0m")
-Project_Json2csv.main()
+Json2csv.main()
 print("\033[1;4mRAW Datasets Combined\033[0m")
 
 print(" ")

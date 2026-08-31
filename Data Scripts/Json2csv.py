@@ -32,7 +32,7 @@ def main():
 
     drop_cols = ['audiobook_title', 'audiobook_uri', 'audiobook_chapter_uri',
              'audiobook_chapter_title', 'episode_name', 'episode_show_name',
-             'spotify_episode_uri']
+             'spotify_episode_uri','ip_addr']
 
     Comb_hist = Comb_hist.drop(columns=[c for c in drop_cols if c in Comb_hist.columns])
     

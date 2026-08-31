@@ -1,0 +1,5 @@
+split,users,sessions,rows,skip_rate,shuffle_share,repeat_share,same_artist_share,mean_hist_skip_rate,mean_hist_artist_skip_rate
+training,33,75875,2537905,0.3815,0.6274,0.1526,0.204,0.2811,0.3328
+validation,33,16262,510661,0.3462,0.6085,0.1275,0.1739,0.2574,0.3139
+testing,33,16280,498215,0.3559,0.5955,0.1203,0.1601,0.2644,0.3153
+all,33,108417,3546781,0.3728,0.6202,0.1445,0.1935,0.2753,0.3276

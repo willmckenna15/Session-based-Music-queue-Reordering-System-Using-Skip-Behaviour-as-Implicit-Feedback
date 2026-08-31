@@ -5,6 +5,31 @@ from matplotlib import pyplot
 from sklearn.linear_model import LogisticRegression
 # same metric definitions the sequence models are scored on, so the numbers compare
 from Model_lib import ndcg_at_k, valid_splits, pick, fast_auc
+import argparse
+import os
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--feature-set', type=str, default='all', 
+                    choices=['all', 'audio-only', 'behavioural-only'],
+                    help='Which features to use')
+args = parser.parse_args()
+
+audio_features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 
+                  'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence']
+
+behavioural_features = ['historical_skip_rate', 'historical_artist_skip_rate', 
+                       'shuffle', 'is_repeat_track', 'same_artist_as_prev']
+
+all_features = audio_features + behavioural_features
+
+if args.feature_set == 'audio-only':
+    features = audio_features
+elif args.feature_set == 'behavioural-only':
+    features = behavioural_features
+else:
+    features = all_features
+
+print(f"Using {args.feature_set}: {len(features)} features")
 
 training_file = '../RAW Data/training_data.parquet'
 validation_file = '../RAW Data/validation_data.parquet'
@@ -15,10 +40,6 @@ extra_cols = ['user_id', 'spotify_track_uri', 'session_id', 'ts']
 
 # actively_selected removed: it is not knowable for an unplayed queue track, so it
 # cannot be deployed. Same 17 features as SASRec/SkipLSTM/ExtraTrees.
-features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
-            'acousticness', 'instrumentalness', 'liveness', 'valence',
-            'historical_skip_rate',
-            'historical_artist_skip_rate', 'shuffle', 'is_repeat_track', 'same_artist_as_prev']
 target = 'skipped'
 
 training_df = pd.read_parquet(training_file, columns=features + [target] + extra_cols)
@@ -31,18 +52,6 @@ validation_df = validation_df.dropna(subset=features).reset_index(drop=True)
 X = training_df[features]
 Y = training_df[target]
 
-'''
-train_skip_rate = (
-    training_df.groupby(["user_id", "spotify_track_uri"])["skipped"]
-    .mean()
-    .rename("historical_skip_rate")
-    .reset_index()
-)
-
-validation_df = validation_df.drop(columns=["historical_skip_rate"])
-validation_df = validation_df.merge(train_skip_rate, on=["user_id", "spotify_track_uri"], how="left")
-validation_df["historical_skip_rate"] = validation_df["historical_skip_rate"].fillna(0)
-'''
 X_val = validation_df[features]
 Y_val = validation_df[target]
 
@@ -72,10 +81,22 @@ for _, g in validation_df.sort_values('ts').groupby('session_id', sort=False):
 print(f'Per-session AUC:    {np.mean(session_aucs):.4f}')
 print(f'Per-session NDCG@5: {np.mean(session_ndcgs):.4f} across {len(session_aucs)} sessions')
 
-'''
-fpr, tpr, thresholds = roc_curve(Y_val, probs)
-pyplot.plot([0, 1], [0, 1], linestyle='--')
-pyplot.plot(fpr, tpr, marker='.')
-pyplot.show()
-'''
 
+# Append this run to the ablation table. One row per feature set, so running the
+# script three times builds the comparison.
+OUT = '../Models/feature_ablation_study.csv'
+row = pd.DataFrame([{
+    'model': 'LogReg',
+    'feature_set': args.feature_set,
+    'n_features': len(features),
+    'pooled_auc': round(auc, 4),
+    'session_auc': round(float(np.mean(session_aucs)), 4),
+    'session_ndcg5': round(float(np.mean(session_ndcgs)), 4),
+    'n_sessions': len(session_aucs),
+    'split': 'validation',
+    'timestamp': pd.Timestamp.now(),
+}])
+if os.path.exists(OUT):
+    row = pd.concat([pd.read_csv(OUT), row], ignore_index=True)
+row.to_csv(OUT, index=False)
+print(f'Appended to {OUT}')

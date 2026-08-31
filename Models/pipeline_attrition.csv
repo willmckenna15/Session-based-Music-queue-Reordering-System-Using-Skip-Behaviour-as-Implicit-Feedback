@@ -1,0 +1,5 @@
+stage,rows,sessions,rows_kept,rows_dropped,sessions_kept,sessions_dropped
+raw exports,5242623,,1.0,0,,0
+session construction,5242623,297141.0,1.0,0,1.0,0
+audio feature join,4714208,281365.0,0.8992,528415,0.9469,15776
+validity filter,3546781,108417.0,0.6765,1167427,0.3649,172948

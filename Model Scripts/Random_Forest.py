@@ -1,25 +1,45 @@
 import pandas as pd
 from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.metrics import roc_curve, roc_auc_score, ndcg_score
-import numpy as np
-from matplotlib import pyplot
-from sklearn.model_selection import ParameterGrid
+from sklearn.metrics import roc_auc_score
 import numpy as np
 from Model_lib import ndcg_at_k, valid_splits, pick, fast_auc
+import argparse
+import os
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--feature-set', type=str, default='all',
+                    choices=['audio-only', 'behavioural-only', 'all'],
+                    help='Which features to use')
+args = parser.parse_args()
 
+audio_features = ['tempo', 'mode', 'danceability', 'energy', 'loudness',
+                  'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence']
+
+behavioural_features = ['historical_skip_rate', 'historical_artist_skip_rate',
+                        'shuffle', 'is_repeat_track', 'same_artist_as_prev']
+
+all_features = audio_features + behavioural_features
+
+if args.feature_set == 'audio-only':
+    features = audio_features
+elif args.feature_set == 'behavioural-only':
+    features = behavioural_features
+else:
+    features = all_features
+
+print(f"Using {args.feature_set}: {len(features)} features")
+
+# Tuned on the full 15-feature set by Random_Forest_tuning.py, and the same config
+# evaluate.py refits for the test-set results. Pinned rather than read from the grid
+# CSV: that file currently holds only the max_depth=8 configs, and every leading
+# config in the fuller search sat at the maximum depth tried, so the grid was
+# bounded from above.
+BEST_PARAMS = dict(max_depth=15, min_samples_leaf=20, n_estimators=200)
 
 training_file = '../RAW Data/training_data.parquet'
 validation_file = '../RAW Data/validation_data.parquet'
 
 extra_cols = ['user_id', 'spotify_track_uri', 'session_id', 'ts']
-
-
-
-features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
-            'acousticness', 'instrumentalness', 'liveness', 'valence',
-            'historical_skip_rate',
-            'historical_artist_skip_rate', 'shuffle', 'is_repeat_track', 'same_artist_as_prev']
 
 target = 'skipped'
 print("Reading Datasets...")
@@ -33,12 +53,9 @@ validation_df = validation_df.dropna(subset=features).reset_index(drop=True)
 X = training_df[features]
 Y = training_df[target]
 
-
 X_val = validation_df[features]
 Y_val = validation_df[target]
 
-# Session structure is the same for every config - only the predictions change,
-# so enumerate the split points once rather than 36 times
 print("Indexing validation sessions...")
 sessions = []
 for _, g in validation_df.sort_values('ts').groupby('session_id', sort=False):
@@ -60,67 +77,42 @@ def score(probs):
     return float(np.mean(aucs)), float(np.mean(ndcgs))
 
 
-# Hyper-Paramater Selection
-param_grid = {
-    'max_depth': [8,10,12,15],
-    'min_samples_leaf': [10,20,30],
-    'n_estimators': [100,200,300]
-}
-
-RESULTS_CSV = '../Models/extratrees_grid_search_results.csv'
-combinations = list(ParameterGrid(param_grid))
-print(f"\nRunning grid search over {len(combinations)} combinations...\n")
-
-results = []
-for i, params in enumerate(combinations, 1):
-    print(f"[{i}/{len(combinations)}] {params}")
-
-    model = ExtraTreesClassifier(random_state=42, n_jobs=-1, **params)
-    model.fit(X, Y)
-    probs = model.predict_proba(X_val)[:, 1]
-
-    _, val_ndcg = score(probs)
-    print(f"NDCG@5: {val_ndcg:.4f} "
-          )
-
-    results.append({**params, 'val_ndcg': val_ndcg, 'n_sessions': len(sessions)})
-    pd.DataFrame(results).sort_values('val_ndcg', ascending=False).to_csv(
-        RESULTS_CSV, index=False)
-
-results_df = pd.DataFrame(results).sort_values('val_ndcg', ascending=False)
-print("\n--- Grid Search Results ---")
-print(results_df.to_string(index=False))
-
-best_params = results_df.iloc[0].to_dict()
-print(f"\nBest config: {best_params}")
-print(f"Results saved to {RESULTS_CSV}")
-'''
-print("Training Model...")
-model = ExtraTreesClassifier(random_state = 42, min_samples_leaf=10, max_depth = 15, n_estimators=300)
-
+print(f"Training Model... {BEST_PARAMS}")
+model = ExtraTreesClassifier(random_state=42, n_jobs=-1, **BEST_PARAMS)
 model.fit(X, Y)
 print("Model trained")
 
 print("Validating model...")
-probs = model.predict_proba(X_val)
-probs = probs[:, 1]
+probs = model.predict_proba(X_val)[:, 1]
 
-print("Calculating importances...")
-importances = model.feature_importances_
-print("--- Feature Importances ---")
-for i in range(len(features)):
-    print(f"{features[i]}: {importances[i]}")
+pooled_auc = roc_auc_score(Y_val, probs)
+session_auc, session_ndcg = score(probs)
 
-print("Calculating AUC-ROC score...")
-auc = roc_auc_score(Y_val, probs)
-print('AUC: %.3f' % auc)
+print(f'Pooled AUC:         {pooled_auc:.4f}')
+print(f'Per-session AUC:    {session_auc:.4f}')
+print(f'Per-session NDCG@5: {session_ndcg:.4f} across {len(sessions)} sessions')
 
+print("\n--- Feature Importances ---")
+for name, imp in sorted(zip(features, model.feature_importances_),
+                        key=lambda kv: -kv[1]):
+    print(f"{name:<30} {imp:.4f}")
 
-'''
-
-'''
-fpr, tpr, thresholds = roc_curve(Y_val, probs)
-pyplot.plot([0, 1], [0, 1], linestyle='--')
-pyplot.plot(fpr, tpr, marker='.')
-pyplot.show()
-'''
+# Append this run to the ablation table. One row per feature set, so running the
+# script three times builds the comparison. Same columns as Log_regression.py, so
+# the two models' rows sit in one table.
+OUT = '../Models/feature_ablation_study.csv'
+row = pd.DataFrame([{
+    'model': 'ExtraTrees',
+    'feature_set': args.feature_set,
+    'n_features': len(features),
+    'pooled_auc': round(pooled_auc, 4),
+    'session_auc': round(session_auc, 4),
+    'session_ndcg5': round(session_ndcg, 4),
+    'n_sessions': len(sessions),
+    'split': 'validation',
+    'timestamp': pd.Timestamp.now(),
+}])
+if os.path.exists(OUT):
+    row = pd.concat([pd.read_csv(OUT), row], ignore_index=True)
+row.to_csv(OUT, index=False)
+print(f'\nAppended to {OUT}')
