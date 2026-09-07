@@ -30,10 +30,6 @@ def session_compiler():
 
 
 def main():
-    # Sessions are only CONSTRUCTED here. Validity filtering and feature derivation happen in
-    # feature_and_filter.py, after the audio join, because that join drops rows and would
-    # otherwise leave sessions that no longer meet the criteria and features computed over
-    # tracks that are no longer present.
     streaming_sessions = session_compiler()
 
     streaming_sessions.to_parquet("../RAW Data/Streaming_Sessions.parquet", index=False)

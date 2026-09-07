@@ -10,6 +10,11 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Subset
 
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                '..', 'Model Scripts'))
+
 from Model_lib import (SessionDataset, collate_fn, SkipLSTM, train_epoch,
                        evaluate_sequential, LengthBucketSampler, log_test)
 

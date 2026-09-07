@@ -38,8 +38,6 @@ extra_cols = ['user_id', 'spotify_track_uri', 'session_id', 'ts']
 
 
 
-# actively_selected removed: it is not knowable for an unplayed queue track, so it
-# cannot be deployed. Same 17 features as SASRec/SkipLSTM/ExtraTrees.
 target = 'skipped'
 
 training_df = pd.read_parquet(training_file, columns=features + [target] + extra_cols)
@@ -82,8 +80,6 @@ print(f'Per-session AUC:    {np.mean(session_aucs):.4f}')
 print(f'Per-session NDCG@5: {np.mean(session_ndcgs):.4f} across {len(session_aucs)} sessions')
 
 
-# Append this run to the ablation table. One row per feature set, so running the
-# script three times builds the comparison.
 OUT = '../Models/feature_ablation_study.csv'
 row = pd.DataFrame([{
     'model': 'LogReg',

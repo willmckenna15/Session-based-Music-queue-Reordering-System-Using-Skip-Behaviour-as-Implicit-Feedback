@@ -7,7 +7,7 @@ def main():
 
     sessions = pd.read_parquet(INPUT)
 
-    print("Normalising Dataset (per user)")
+    print("Normalising Dataset (per session)")
     cols_to_normalise = ['danceability', 'energy', 'speechiness', 'acousticness',
                          'instrumentalness', 'liveness', 'valence', 'loudness', 'tempo']
     Streaming_sessions  = sessions.groupby('session_id')[cols_to_normalise]

@@ -29,7 +29,7 @@ else:
 
 print(f"Using {args.feature_set}: {len(features)} features")
 
-# Tuned on the full 15-feature set by Random_Forest_tuning.py, and the same config
+# Tuned on the full 15-feature set by ExtraTreesClassifier_tuning.py, and the same config
 # evaluate.py refits for the test-set results. Pinned rather than read from the grid
 # CSV: that file currently holds only the max_depth=8 configs, and every leading
 # config in the fuller search sat at the maximum depth tried, so the grid was

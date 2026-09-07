@@ -20,27 +20,53 @@ Implementation, Testing & Evaluation & Reflection, and Presentation. Chapters
   carrying the signal; PWTS best on both architectures; LSTM and SASRec
   statistically indistinguishable.
 
-## 1. Introduction (~700 words)
+## 1. Introduction, Aims and Objectives (~1,000 words)
 
-Write this chapter **last**. Every figure in it has to match the final results
-table, and the framing only settles once you know what the results say.
-Six paragraphs, budgeted below.
+**Chapters 1 and 2 are merged.** The aim of this project follows directly from the
+problem statement, and separating them across a chapter boundary forces the
+problem to be restated twice. Merging also removes the weakest section of a
+typical dissertation — a 400-word chapter that says little the introduction has
+not already implied.
 
-### 1.1 The problem (~120 words)
+**Numbering consequence, decide before writing.** Your drafted chapters are
+numbered 4 to 7. Merging 1 and 2 leaves chapter 3 for the literature review and
+nothing at 2 — so either renumber everything down by one (touching four written
+chapters and every cross-reference), or keep the literature review at 3 and let
+chapter 2 be something else. The cheapest resolution is to make **2 the
+literature review** and **3 the methodology**, which the current chapter 4
+partially is.
 
-- Open on the concrete situation, not the field. A listener queues an album or a
-  playlist on shuffle; the order is arbitrary; some tracks are skipped within
-  seconds. **Do not open with "with the rise of streaming services" — the marker
-  has read that opening forty times.**
-- Streaming research overwhelmingly asks *what to play next*. Far less asks *in
-  what order to play what the user has already chosen.*
-- Frame queue reordering as a **ranking** problem, not a retrieval one: the
-  candidate set is fixed, small, and already selected by the user.
-- Draw the consequence immediately, because it justifies the architecture in
-  ch. 5: there is no catalogue-scale cold start, and **no need for an item
-  embedding table** — you only ever rank tracks already in hand.
-- One sentence on why that is worth doing: the same listening session, reordered,
-  produces fewer skips without adding or removing a single track.
+**Write this chapter last.** Every figure in it must match the final results
+table, and the framing only settles once the results are known.
+
+### 1.1 The problem (~180 words)
+
+- Open on the concrete situation, not the field. A listener puts an album on
+  shuffle and skips the first track within thirty seconds, then the second.
+  **Do not open with "with the rise of streaming services" — the marker has read
+  that opening forty times.**
+- **Get the contrast right, because the obvious version of it is wrong.** Do not
+  write that the field asks *what to play next* while this project asks *in what
+  order* — deciding what plays next is exactly what this system does. The real
+  distinction is the **candidate set and what changes as a result**:
+  - recommendation and autoplay select from a catalogue of millions, and the
+    *contents* of the session change;
+  - queue reordering selects from a bounded set the listener already holds —
+    nothing is added, nothing removed, and **only the sequence changes**.
+- That second property is the claim. The same tracks are heard either way.
+- It follows that this is a **ranking** problem over a bounded, given candidate
+  set, not a retrieval problem over an open one — which justifies the architecture
+  in ch. 5: no catalogue-scale cold start, and **no item embedding table**.
+- **Say "bounded and given", not "chosen by the user".** The listener chose a
+  source — a playlist, an album, an artist — not the individual tracks, and under
+  shuffle not the order either. The model needs a queue, not its provenance.
+- **Shuffle is the common case and the one with most to gain**, which is a
+  stronger argument than user choice: 62.7% of plays occur in shuffle mode, and
+  those are skipped at 0.438 against 0.287 unshuffled. A deliberately sequenced
+  queue may have an order worth preserving; a shuffled one has none.
+- Keep the *second* contrast — that the skip-prediction literature predicts
+  without acting on the prediction — for 1.6. Conflating the two contrasts into
+  one sentence is what produces the wrong version above.
 
 ### 1.2 Skip behaviour as the signal (~140 words)
 
@@ -50,117 +76,116 @@ Six paragraphs, budgeted below.
   them, and the user does nothing extra.
 - But it is **ambiguous**. A skip can mean dislike, wrong mood, heard-it-already,
   or an interruption with nothing to do with the track. One sentence here; it
-  returns properly as a limitation in ch. 8. Do not bury it — a marker who spots
-  the ambiguity before you name it reads the whole report as naive.
+  returns as a limitation in ch. 8. Do not bury it — a marker who spots the
+  ambiguity before you name it reads the whole report as naive.
 - State your operational definition of `skipped` in plain words (one sentence);
   defer the exact rule to ch. 4.
-- **Name the random floor in the introduction.** Because most tracks are not
-  skipped, random ordering already scores NDCG@5 ≈ 0.696 and MRR ≈ 0.772. Giving
-  the floor up front reframes every later number and stops the marker reading a
-  headline 0.77 as impressive. This is the single most important sentence in the
-  chapter for the Evaluation marks.
+- **Name the random floor here.** Because most tracks are not skipped, random
+  ordering already scores NDCG@5 ≈ 0.688. Giving the floor up front reframes
+  every later number and stops a marker reading a headline 0.79 as impressive.
+  The single most valuable sentence in the chapter for the Evaluation marks.
 
 ### 1.3 The deployability constraint (~140 words)
 
-*This is the project's distinctive move. Give it its own paragraph and claim it.*
+*The project's distinctive move. Give it its own paragraph and claim it.*
 
 - The rule in one sentence: **a feature may be used only if its value is knowable
   for a track that has not yet been played.**
-- Two features were excluded by it — `actively_selected` and `reason_start`. Both
-  describe how a track's playback *began*, so both exist only after the fact.
+- `actively_selected` was excluded by it, and `reason_start` — from which it is
+  derived — was never used as an input. Both describe how a track's playback
+  *began*, so both exist only after the fact.
 - Why it matters: a model using them scores well offline and cannot be deployed.
   Much of the skip-prediction literature, the WSDM Cup 2019 framing included,
-  predicts skips for tracks that are *already playing* — a different task with a
-  different information set.
+  predicts skips for tracks *already playing* — a different task with a different
+  information set.
 - **State the cost honestly.** The constraint lowers the achievable ceiling. That
-  is the point: you traded offline score for a system that could actually run,
-  and you should present that trade as a design contribution rather than
-  apologise for the resulting numbers.
-- One sentence on what the constraint does *not* forbid: skip outcomes for tracks
-  already played *earlier in the same session* are legitimately available at
-  prediction time, and both neural models use them.
+  is the point: you traded offline score for a system that could run, and that
+  trade is a design contribution rather than something to apologise for.
+- One sentence on what it does *not* forbid: skip outcomes for tracks already
+  played earlier in the same session are legitimately available, and both neural
+  models use them.
 
-### 1.4 What was built (~100 words)
+### 1.4 Aim and objectives (~220 words)
+
+*This is the merged material, and it belongs here because it follows from 1.1–1.3
+rather than restating them.*
+
+- **The aim in one sentence:** to rank the unplayed tracks in a listening queue by
+  predicted skip probability, using only information available at the moment of
+  reordering, and to establish whether sequential models improve that ranking over
+  simpler alternatives.
+- **Objectives as work packages**, each with an outcome that can be checked:
+  1. Collect and process volunteer listening histories into session-structured
+     data with a leak-free chronological split — *ch. 4*
+  2. Define an evaluation protocol appropriate to within-session ranking, with a
+     stated random floor — *ch. 7*
+  3. Implement four model families and three loss functions under a common
+     interface and an equal tuning protocol — *ch. 5, 6*
+  4. Establish whether sequence modelling improves ranking over flat baselines —
+     *ch. 8.2–8.4*
+  5. Establish whether audio content features contribute beyond behavioural ones —
+     *ch. 8.5*
+- **State how success is measured**, explicitly: per-session NDCG@5 as the primary
+  metric, AUC secondary, both against the random-ordering floor, with differences
+  below the seed-noise threshold reported as unresolved.
+- **Phrase each objective so it maps to a results subsection.** Markers check
+  objectives against outcomes, and an objective with no corresponding result reads
+  as abandoned. Note that objectives 4 and 5 are questions, not targets — they are
+  satisfied by a credible answer, including a negative one.
+
+### 1.5 What was built and what was found (~250 words)
 
 - Four model families in one sentence: logistic regression, extremely randomised
-  trees, an LSTM, and a SASRec adaptation without item embeddings.
-- Three loss functions across the two neural architectures — BCE, PWTS
-  (position/time/history weighted), DrRL — giving six trained arms plus two
-  baselines and a random floor.
-- Scale, in one clause, because it evidences the Implementation marks: 1,080
-  tuning configurations, five seeds per final arm, run on the departmental SLURM
-  cluster.
-- Evaluation in one sentence: per-session, at up to five evenly spaced split
-  points, averaged within session before across sessions.
-- Resist listing every metric here. NDCG@5 primary, AUC secondary; the rest
-  belongs in ch. 7.
+  trees, an LSTM, and a SASRec adaptation without item embeddings. Three losses
+  across the two neural architectures — BCE, PWTS, DrRL — giving six trained arms
+  plus two baselines and a random floor.
+- Scale in one clause, because it evidences the Implementation marks: 1,080 tuning
+  configurations, five seeds per arm, run as SLURM job arrays.
+- Then the three findings, one sentence each, with numbers:
+  - **Audio features alone are at chance.** Session AUC 0.507 and 0.504 against a
+    floor of 0.502 — and ExtraTrees on audio alone scores NDCG@5 0.694,
+    *fractionally below* the 0.696 floor. A cleaner result than "slightly above
+    chance".
+  - **Behavioural features carry the signal**, reaching 0.592 / 0.605 AUC, and
+    adding the ten audio features on top changes nothing (0.594 / 0.603) — inside
+    seed noise, and the two models disagree in *sign*, which is the cleanest
+    evidence that the contribution is zero rather than small.
+  - **Architecture matters less than expected.** PWTS is the best loss on both
+    architectures; the gap between them is small relative to seed variance.
+- One sentence on why the null results are the report's strongest material: they
+  contradict a standing assumption, and they come from an ablation designed in
+  advance rather than a failure explained afterwards.
+- **Do not oversell.**
 
-### 1.5 What was found (~130 words)
-
-State the three findings plainly, one sentence each, with numbers.
-
-- **Audio features alone are at chance.** Session AUC 0.507 (logistic regression)
-  and 0.504 (extremely randomised trees) against a random floor of 0.502. Ten
-  Spotify audio descriptors carry essentially no skip signal in this data — and
-  ExtraTrees on audio alone scores NDCG@5 0.694, *fractionally below* the 0.696
-  random floor. Worth naming: it is a cleaner result than "slightly above chance".
-- **Behavioural features carry the signal.** Five behavioural features reach
-  session AUC 0.592 / 0.605 and NDCG@5 0.753 / 0.771. Adding the ten audio
-  features on top changes nothing (0.594 / 0.603) — inside seed noise.
-- **Architecture matters less than expected.** The LSTM and SASRec are
-  statistically indistinguishable under a paired bootstrap over per-session
-  scores; PWTS is the best loss on both.
-- Add one sentence on why null results are the strongest part of the report: they
-  contradict a standing assumption (that content features drive music taste), and
-  they come from an ablation you designed deliberately — not from a failure being
-  explained after the fact.
-- **Do not oversell.** The brief rewards honest evaluation.
-
-### 1.6 Comparable systems (~90 words — brief, detail in ch. 3)
-
-One sentence each, then one sentence on the gap.
+### 1.6 Comparable systems (~90 words — detail in ch. 2/3)
 
 - **Spotify smart shuffle / autoplay** — the commercial comparator. Reorders and
-  extends a queue, but is proprietary and its objective function is unpublished,
-  so it cannot be benchmarked against.
+  extends a queue, but is proprietary and its objective unpublished.
 - **WSDM Cup 2019 Spotify Sequential Skip Prediction** — the academic comparator.
   Same signal, different task: predict skips within a session as it unfolds, with
   no reordering and no deployability constraint.
 - **Automatic playlist continuation** (RecSys Challenge 2018) — the adjacent task.
-  *Extends* a playlist with new tracks; this project *reorders* tracks the user
-  already chose.
-- The gap in one sentence: none of them convert a skip prediction into a queue
-  order and then measure the ranking quality of that order.
+  *Extends* a playlist; this project *reorders* what the user already chose.
+- The gap in one sentence: none convert a skip prediction into a queue order and
+  then measure the ranking quality of that order.
 
 ### 1.7 Roadmap (~80 words)
 
-- One sentence per chapter, written as prose. **Not a bulleted list** — a
-  bulleted roadmap reads as filler and costs Presentation marks.
-- Keep it factual and specific: "Chapter 4 describes the data pipeline and the
-  chronological per-user split; Chapter 5 sets out three design decisions that
+- One sentence per chapter, written as prose. **Not a bulleted list** — a bulleted
+  roadmap reads as filler and costs Presentation marks.
+- Factual and specific: "Chapter 4 describes the data pipeline and the
+  chronological per-user split; Chapter 5 sets out the design decisions that
   follow from the deployability constraint; …"
 
 ### Before you write this chapter
 
-- Reconcile the **session-count mismatch** (12,011 / 12,014 / 12,011) before
-  quoting any exact figure. If it is a `dropna` interaction, say so in ch. 4 in
-  one sentence rather than leaving a marker to notice the inconsistency.
-- Every number here must match ch. 7 exactly, including rounding.
-- Keep citations to one or two at most — the introduction is not the literature
-  review.
-- Do not state a hypothesis you do not go on to test. If you frame the project as
-  testing whether audio features help, the ablation must be presented as the test
-  of it, not as a side experiment.
-
-## 2. Aims and Objectives (~400 words)
-
-- Aim: rank unplayed queue tracks by predicted skip probability
-- Objectives as workpackages with measurable outcomes — data pipeline, four
-  models, three losses, evaluation protocol, feature ablation
-- **State how success is measured**: per-session NDCG@5 as primary, AUC
-  secondary, against the random-ordering floor
-- Reviewers check objectives against outcomes, so phrase them so each maps to a
-  results subsection
+- Every number must match ch. 8 exactly, including rounding. If `evaluate.py` is
+  re-run, this chapter changes with it — another reason to write it last.
+- Keep citations to two or three. The introduction is not the literature review.
+- Do not state a hypothesis you do not test. If you frame the project as testing
+  whether audio features help, the ablation must be presented as the test of it,
+  not as a side experiment.
+- Decide the chapter numbering before writing any cross-reference.
 
 ## 3. Background / Literature review (~1,600 words)
 
@@ -171,6 +196,108 @@ One sentence each, then one sentence on the gap.
 - Address any marker feedback on the proposal
 - Each design choice in ch. 5 should be traceable to something argued here
 - Verify every reference against the publisher before it goes in
+
+**Verification key.** `[V]` — title, venue and identifier confirmed against a
+publisher, arXiv or author page. `[C]` — plausible from background knowledge but
+**not** confirmed here; open the DOI and check authors, year, venue and pages
+before it enters your bibliography. The brief warns specifically about fabricated
+references, and `[C]` entries are exactly where a fabrication would hide.
+
+### 3.1 Traceability — every design decision to a source
+
+*Read each row as: the decision is the claim, the source is what makes it more
+than a preference. A row you cannot defend from its source is a row an examiner
+can ask you to justify from first principles. Anything you cite here must be
+**analysed** in this chapter — a citation that appears for the first time in
+ch. 5 has not been reviewed, it has been name-dropped.*
+
+| § | Design decision | Sources to analyse |
+|---|---|---|
+| 4.3 | 30 minutes of inactivity ends a session | Catledge & Pitkow (1995) `[V]`; Brost et al. (2019) `[V]` |
+| 4.4 | Ten audio features joined from a bulk corpus | Spotify (2024) endpoint deprecation `[C]` |
+| 4.5 | `fwdbtn` / `clickrow` define the skip label | Brost et al. (2019) `[V]`; Meggetto et al. (2021) `[C]` |
+| 4.6 | Historical skip rates as confidence-style features | Hu, Koren & Volinsky (2008) `[C]` |
+| 4.7 | Validity filtering discards 61.5% of sessions | Ludewig & Jannach (2018) `[C]`; Cañamares & Castells (2020) `[C]` |
+| 4.8 | Per-session z-scoring; chronological per-user split | Meng et al. (2020) `[C]` |
+| 5.1 | Only features knowable for an *unplayed* track | Zinkevich (2017) `[C]` |
+| 5.2–5.3 | `actively_selected` excluded despite predictive value | Xu et al. (2020) `[V]`; Vapnik & Vashist (2009) `[C]` |
+| 5.4 | Strong non-neural baselines are mandatory | Ferrari Dacrema et al. (2019) `[V]`; Ludewig & Jannach (2018) `[C]` |
+| 5.4 | Equal tuning budget across every arm | Shehzad & Jannach (2023) `[C]` |
+| 5.5 | Baselines score each track independently | Ludewig & Jannach (2018) `[C]` |
+| 5.6 | An LSTM to isolate recurrence | Hochreiter & Schmidhuber (1997) `[C]`; Hidasi et al. (2016) `[C]`; Adapa (2019) `[V]` |
+| 5.7 | SASRec adapted from a public implementation | Kang & McAuley (2018) `[V]`; Huang (2020) `[V]` *(code)*; Vaswani et al. (2017) `[C]` |
+| 5.8 | Three-state status channel, summed, *unknown* zero-initialised | Kim et al. (2022, arXiv:2205.06058) `[V]`; Wu et al. (2020) `[V]`; Sun et al. (2019) `[C]` |
+| 5.9 | Context/query mask stops queue tracks attending each other | Kang & McAuley (2018) `[V]`; Sun et al. (2019) `[C]` |
+| 5.10 | PWTS **position** weight | Lin et al. (2017) `[C]`; Jeunen & Goethals (2019) `[C]` |
+| 5.10 | PWTS **time** weight | Yi et al. (2014) `[C]`; Wu et al. (2020) `[V]` |
+| 5.10 | PWTS **historical** weight | Hu, Koren & Volinsky (2008) `[C]` |
+| 5.10 | DrRL as a third objective | Zhang et al. (2025) `[V]`; Duchi & Namkoong (2021) `[C]` |
+| 5.10 | Pointwise rather than pairwise or listwise | Burges et al. (2005) `[C]`; Cao et al. (2007) `[C]` |
+| 7.1 | Per-session rather than pooled scoring | Castells & Moffat (2022) `[V]`; Krichene & Rendle (2020) `[C]` |
+| 7.2 | Multiple split points per session | Meng et al. (2020) `[C]` |
+| 7.3 | NDCG@5 as the selection metric | Järvelin & Kekäläinen (2002) `[C]` |
+| 7.3 | AUC via the Mann–Whitney identity (`fast_auc`) | Hanley & McNeil (1982) `[V]` |
+| 7.3 | P@5 reported alongside | Manning, Raghavan & Schütze (2008) `[V]` |
+| 7.3 | The full remaining queue is scored, not a sample | Krichene & Rendle (2020) `[C]` |
+| 7.4 | Five seeds; differences judged against 2 × sd | Bouthillier et al. (2021) `[C]`; Henderson et al. (2018) `[C]` |
+| 7.5 | Paired bootstrap over per-session scores | Smucker, Allan & Carterette (2007) `[C]` |
+| 8.5 | Audio-only ablation sits at the random floor | van den Oord et al. (2013) `[V]`; Oramas et al. (2017) `[V]`; Schedl et al. (2018) `[V]` |
+| 8.6 | The PWTS null result reported as a finding | Bouthillier et al. (2021) `[C]`; Ferrari Dacrema et al. (2019) `[V]` |
+| 8.7 | A skip is not a dislike | Meggetto et al. (2023) `[V]`; Seshadri et al. (2024) `[V]` |
+| 1.6 / 8.7 | Reordering is already deployed at scale | Moor et al. (2023) `[V]`; Hansen et al. (2020) `[C]`; Bendada et al. (2023) `[V]` |
+| 4.10 / 6.1 | Tooling | Paszke et al. (2019) `[C]`; Pedregosa et al. (2011) `[C]` |
+
+**Three rows carry unusual weight.** *5.7* is where you declare what you
+inherited — an examiner who finds `PointWiseFeedForward` unattributed will
+discount everything else you claim to have built. *5.1* is the constraint the
+whole design turns on, and it currently rests on one grey-literature source, so
+Xu et al. gives it a peer-reviewed anchor. *8.7* is where the polysemy of skips
+turns a limitation into an argued position rather than an admission.
+
+### 3.2 The candidate pool
+
+*Roughly 50 candidates across seven themes; a review of this length lands on
+**30–35**. Take one of each near-substitute pair: Meggetto 2023/2021, Ferrari
+Dacrema 2019/2021, Bouthillier/Henderson.*
+
+| Theme | Take | Core sources |
+|---|---|---|
+| **A. Skip behaviour & streaming sessions** | 6–8 | Brost, Booth & Lamere (2019) `[V]`; Meggetto et al. (2023) `[V]`, (2021) `[C]`; Adapa (2019) `[V]`; Chang, Lee & Lee (2019) `[V]`; Jeunen & Goethals (2019) `[C]`; Béres et al. (2019) `[C]`; Hansen et al. (2020) `[C]`; Seshadri, Shashaani & Knees (2024) `[V]`; Moor et al. (2023) `[V]` |
+| **B. Sequential architectures** | 6–7 | Kang & McAuley (2018) `[V]`; Hidasi et al. (2016) `[C]`; Sun et al. (2019) `[C]`; Vaswani et al. (2017) `[C]`; Hochreiter & Schmidhuber (1997) `[C]`; Quadrana et al. (2018) `[C]`; Ludewig & Jannach (2018) `[C]` |
+| **C. Implicit feedback** | 5–6 | Hu, Koren & Volinsky (2008) `[C]`; Rendle et al. (2009) `[C]`; Jannach, Lerche & Zanker (2018) `[V]`; Wang et al. (2021) `[V]`; Yi et al. (2014) `[C]`; Kim et al. (2022) `[V]`; Wu et al. (2020) `[V]` |
+| **D. Music & audio content** | 4–5 | van den Oord et al. (2013) `[V]`; Schedl et al. (2018) `[V]`; Oramas et al. (2017) `[V]`; Zamani et al. (2019) `[V]`; Bendada et al. (2023) `[V]`; Spotify (2024) `[C]` |
+| **E. Losses & ranking objectives** | 3–5 | Zhang et al. (2025) `[V]`; Duchi & Namkoong (2021) `[C]`; Lin et al. (2017) `[C]`; Burges et al. (2005) `[C]`; Cao et al. (2007) `[C]` |
+| **F. Offline evaluation** | 5–7 | Ferrari Dacrema et al. (2019) `[V]`; Castells & Moffat (2022) `[V]`; Järvelin & Kekäläinen (2002) `[C]`; Krichene & Rendle (2020) `[C]`; Smucker, Allan & Carterette (2007) `[C]`; Meng et al. (2020) `[C]`; Cañamares & Castells (2020) `[C]`; Hanley & McNeil (1982) `[V]`; Manning et al. (2008) `[V]` |
+| **G. Variance & honest reporting** | 2–3 | Bouthillier et al. (2021) `[C]`; Henderson et al. (2018) `[C]`; Shehzad & Jannach (2023) `[C]` |
+| **H. Deployability & train/serve skew** | 2–3 | Zinkevich (2017) `[C]`; Xu et al. (2020) `[V]`; Vapnik & Vashist (2009) `[C]` |
+
+**The gap you are claiming.** Theme A predicts *whether* a track is skipped;
+none of it reorders the remaining queue using that prediction. State the gap in
+those terms and every design decision above becomes a response to it. Be careful
+with Moor et al. (2023) — a 7M-user randomised trial at Spotify that increased
+completion and reduced skips. It does not close your gap, but it does refute any
+claim that no service attempts this, so cite it before a marker raises it.
+
+### 3.3 Full details for the sources not already in your bibliography
+
+- Catledge, C.L. and Pitkow, J.E. (1995) 'Characterizing browsing strategies in the World-Wide Web', *Computer Networks and ISDN Systems*, 27(6), pp. 1065–1073. `[V]` — the 30-minute threshold's origin; note it is a 1995 web-browsing study, not a music one.
+- Kang, W.-C. and McAuley, J. (2018) 'Self-Attentive Sequential Recommendation', *ICDM '18*. IEEE, pp. 197–206. doi:10.1109/ICDM.2018.00035 `[V]`
+- Huang, Z. (2020) *SASRec.pytorch*. GitHub: `pmixer/SASRec.pytorch`, Apache-2.0. `[V]` — the implementation you adapted; §4 of the licence requires a copy of the licence and a notice of changes.
+- Hanley, J.A. and McNeil, B.J. (1982) 'The meaning and use of the area under a receiver operating characteristic (ROC) curve', *Radiology*, 143(1), pp. 29–36. `[V]`
+- Xu, C. et al. (2020) 'Privileged Features Distillation at Taobao Recommendations', *KDD '20*, pp. 2590–2598. doi:10.1145/3394486.3403309 `[V]`
+- Zinkevich, M. (2017) *Rules of Machine Learning: Best Practices for ML Engineering*. Google. `[C]` — grey literature; pair it with Xu et al.
+- Vapnik, V. and Vashist, A. (2009) 'A new learning paradigm: Learning using privileged information', *Neural Networks*, 22(5–6), pp. 544–557. `[C]`
+- Meng, Z. et al. (2020) 'Exploring Data Splitting Strategies for the Evaluation of Recommendation Models', *RecSys '20*. `[C]`
+- Zhang, S., Chen, J., Li, C., Zhou, S., Shi, Q., Feng, Y., Chen, C. and Wang, C. (2025) 'Advancing Loss Functions in Recommender Systems: A Comparative Study with a Rényi Divergence-Based Solution', *AAAI*, 39(12), pp. 13286–13294. `[V]`
+- Moor, D., Yuan, Y., Mehrotra, R., Dai, Z. and Lalmas, M. (2023) 'Exploiting Sequential Music Preferences via Optimisation-Based Sequencing', *CIKM '23*. `[V]`
+- Seshadri, V., Shashaani, S. and Knees, P. (2024) *RecSys '24*. doi:10.1145/3640457.3688188 `[V]`
+- Manning, C.D., Raghavan, P. and Schütze, H. (2008) *Introduction to Information Retrieval*. Cambridge University Press. `[V]`
+
+**Do not cite Campos et al. (2018), *Skip RNN* (arXiv:1708.06834)** unless you
+mean to. It is about skipping RNN *state updates* for efficiency, nothing to do
+with music. The name collides with your `SkipLSTM` and a reader may assume a
+relationship that does not exist — one sentence distinguishing them is cheap
+insurance.
 
 ## 4. Methodology and Methods (~1,000 words)
 
@@ -507,7 +634,7 @@ available to you in the whole report.*
   substantially faster at this data scale.
 - Grid over `max_depth`, `min_samples_leaf`, `n_estimators`.
 - **Reconcile before writing:** `extratrees_grid_search_results.csv` contains only
-  `max_depth=8` rows, with (8, 20, 100) best at 0.7666 — but `Random_Forest.py`
+  `max_depth=8` rows, with (8, 20, 100) best at 0.7666 — but `ExtraTreesClassifier.py`
   hardcodes `max_depth=15, min_samples_leaf=20, n_estimators=200`. The recorded
   search does not support the parameters in use. Either the CSV is a partial merge
   or the values came from elsewhere; find out which.
@@ -710,26 +837,289 @@ characterises them.*
 - Every claim in 5.2 is measured and reproducible; quote the figures rather than
   writing "significantly more predictive".
 
-## 6. Implementation (~1,000 words) — 30% of marks
+## 6. Implementation (~1,050 words) — 30% of marks
 
-- Selected points only, not a tour of the code
-- Worth covering: multi-point evaluation; `fast_auc`; length-bucketed batching
-  (6.23× → 1.01× padding, 3.2× faster); SLURM job arrays for 1080 configs
-- Two defects found and fixed, both good material: DrRL's `beta` stepped twice
-  by two optimisers at ~166× the intended rate; DrRL saturating on sigmoid
-  outputs, fixed by moving to logits
-- Point to the appendix for detail
+**Not a tour of the code.** Select the decisions that required judgement and the
+errors that required diagnosis. The brief asks explicitly for error analysis, and
+this is the chapter where you have more of it than most projects ever produce —
+six defects, each found by measurement rather than by a crash. Lead with that as
+an asset rather than burying it at the end.
+
+### 6.1 Structure and reuse (~110 words)
+
+- `Model_lib.py` is a shared library, not a utility dump: `SessionDataset`,
+  `collate_fn`, both architectures, the training loop and every metric.
+- **The point worth making:** `ndcg_at_k`, `valid_splits`, `pick` and `fast_auc`
+  are imported by `Log_regression.py` and `ExtraTreesClassifier.py` too. The sklearn
+  baselines and the neural models are therefore scored by *the same functions*,
+  not by two implementations that agree by inspection. That is what makes the
+  nine-row table in ch. 8 a comparison rather than a collation.
+- The four models share one call signature `(x, lengths, status, boundaries)`, so
+  `evaluate.py` treats them interchangeably.
+
+### 6.2 Performance engineering (~260 words)
+
+*Three optimisations, each with a measured before-and-after. Give the numbers —
+an optimisation without a measurement is an assertion.*
+
+- **`fast_auc`** — AUC via the Mann-Whitney rank statistic rather than
+  `sklearn.roc_auc_score`. Agrees with sklearn to **1.7 × 10⁻¹⁶** and is
+  **14.3× faster**; it skips per-call input validation and never materialises the
+  ROC curve. Justified because AUC is computed once per session per split point
+  per epoch — tens of thousands of calls per training run, not one.
+- **`LengthBucketSampler`** — batching sessions of similar length together.
+  Padding waste fell from **6.23× to 1.01×** and training ran **3.2× faster**,
+  with no change to the loss, because sessions range from 7 to 1,148 tracks and a
+  naïve batch pads everything to its longest member.
+- **Chunked corpus scan** in `audio_features_clean.py` — the audio-feature corpus
+  is 11 GB across ten Parquet files. Each is read with column projection
+  (11 of 17 columns), filtered to matching track IDs, and released before the next
+  is opened, so peak memory holds only the matched subset rather than the corpus.
+- **Chunked evaluation** — `evaluate_sequential` expands each session into one row
+  per split point, which multiplies batch size; the forward pass is chunked to
+  keep long sessions inside memory.
+- Report these as engineering decisions with reasons, not as a list of tricks. The
+  common thread is that each follows from a property of *this* data — session
+  length variance, call frequency, corpus size.
+
+### 6.3 Running the experiments (~200 words)
+
+- **1,080 tuning configurations** as SLURM job arrays, split 54/54/162 for the
+  LSTM and 162/162/486 for SASRec (→ 8.1 for why they differ).
+- **One configuration per array task, each writing its own CSV**, merged
+  afterwards by script. Say why: concurrent tasks appending to a shared file
+  interleave and corrupt it, and a per-task file also makes a failed task visible
+  as a missing file rather than as silently absent rows.
+- **The environment failures are worth reporting**, and this is the section for
+  them:
+  - `sbatch --wrap` executes under `/bin/sh`, where `source` does not exist, so
+    `source ~/venv/bin/activate` fails silently and the job falls through to the
+    system interpreter. Calling the venv's `python3` by absolute path is the fix.
+  - Deleting the virtual environment while an array was queued killed **742
+    tasks** with exit 127 under `set -euo pipefail`.
+  - `--gpus=1` requires `cons_tres`; `--gres=gpu:1` is the portable form.
+  - SASRec/BCE at 256 hidden units and 16 heads exceeded GPU memory on the
+    default partition and required `a40`.
+- **Frame these as operational findings, not as apology.** A dissertation that
+  reports what broke on a shared cluster is more useful than one that implies
+  everything ran first time.
+
+### 6.4 Defects found and corrected (~360 words)
+
+*The strongest section available to you. Every one of these was found by
+measurement, not by a crash — say so, because that is the distinction between
+debugging and error analysis.*
+
+**Two in DrRL:**
+
+- **β stepped twice per batch.** `self.beta` is an `nn.Parameter`, so it reached
+  the main Adam optimiser through `criterion.parameters()` *and* was stepped by
+  its own SGD instance inside `update_beta`. The gradient left behind by the
+  second was consumed by the first, moving β at **roughly 166× the intended
+  rate**. Fixed by clearing `self.beta.grad` after the dedicated step. Note the
+  cause: two optimisers is the reference implementation's design, and the bug came
+  from wiring rather than from the method.
+- **Gradient saturation on bounded outputs.** DrRL is defined over unbounded
+  ranking scores; applied to sigmoid outputs the gradient fell from
+  **4.28 × 10⁻⁴ to 1.04 × 10⁻⁴** as the logit spread grew from 1 to 6 — the loss
+  weakened exactly as the model improved. Fixed by removing the output sigmoid
+  across both architectures (→ 5.10).
+
+**Two in the pipeline:**
+
+- **Temporal leak in the historical rates.** `historical_skip_rate` and
+  `historical_artist_skip_rate` sorted by the *string* `session_id` before the
+  expanding mean. For users with ten or more sessions, string ordering puts
+  `_10` before `_2`, so rows from later sessions entered the "past" window. Fixed
+  by sorting on `ts`. **This is the most serious of the six** — it is silent, it
+  inflates results, and it would have survived to submission undetected.
+- **Early stopping firing before convergence.** In the PWTS ablation the variant
+  ranking was perfectly separated by training length: the top seven variants were
+  exactly the seven whose seeds all ran ≥15 epochs, the bottom eight exactly those
+  with a seed stopping at 7 or 9. A minimum-epoch floor and a re-run removed the
+  artefact entirely — correlation between training length and score fell from
+  **+0.751 to −0.016**, and seed variance from ~0.0055 to 0.0008 (→ 8.6).
+
+**Two in tooling:**
+
+- **`evaluate.py` saved the last seed's per-session scores** while reporting the
+  five-seed mean, so any paired test would have tested a model that was not the
+  one in the results table. Detected because the three single-seed rows matched
+  the table exactly and all six multi-seed rows did not, with the discrepancy
+  tracking seed variance (worst on DrRL at 0.021 NDCG@5).
+- **A silently ignored command-line flag.** `parse_known_args` discards
+  unrecognised arguments, so `--feature-set` passed to a script that did not
+  implement it was dropped without error, training the full-feature model and
+  overwriting the headline checkpoints.
+
+### 6.5 Reproducibility (~120 words)
+
+- Five seeds per arm, **every checkpoint retained**, not only the best — the
+  per-seed spread is what puts error bars on ch. 8.
+- Validation loaders are length-sorted with `shuffle=False`, and `pick()` selects
+  split points deterministically by even spacing rather than sampling, so
+  evaluation has no run-to-run variation and no seed of its own.
+- Selected hyperparameters are written to JSON per arm, so training and evaluation
+  read the same configuration rather than restating it.
+- **State honestly what is not reproducible:** UUIDs are regenerated on each
+  pipeline run, so user and session identifiers differ between executions even
+  though the data does not.
+
+### Before you write this chapter
+
+- Every number above is measured and in your notes — quote them rather than
+  writing "significantly faster".
+- Decide the split with ch. 5: *design decisions* there, *how they were realised
+  and what went wrong* here. `total_length` pinning and the `nn.LSTM` dropout trap
+  currently sit in 5.6 and belong here.
+- Point to an appendix for the full tuning tables rather than reproducing them.
 
 ## 7. Testing and Evaluation (~1,300 words) — part of 30%
 
-- The brief wants **systematic** experimental design, not assorted results
-- The evaluation protocol and its justification: per-session vs pooled, and the
-  ~30.9% between-session variance that motivates it
-- Multi-point splits, and why single-point sampling was inadequate
-- Metric definitions, including NDCG@5's ascending-by-skip-probability ordering
-- **The random floor** — and MRR's saturation at 0.767
-- Experimental design: tuning → training (5 seeds) → held-out test
-- Noise floor and the resolution threshold you will apply
+**This chapter justifies the measurement; chapter 8 reports what it measured.**
+Keep results out of it. Its job is to make every number in ch. 8 credible before
+the reader sees one, which is why it comes first.
+
+### 7.1 Per-session rather than pooled scoring (~230 words)
+
+- **The decision:** every metric is computed within a session and averaged across
+  sessions, never pooled over all rows at once.
+- **The reason, stated as a property of the task:** pooled AUC is rewarded for
+  separating high-skip-rate sessions from low-skip-rate ones. A queue reorderer
+  never makes that comparison — it only ever orders tracks *within* one session,
+  so any credit for between-session discrimination is credit for a decision the
+  system does not make.
+- **Give the evidence rather than asserting it.** Your feature ablation contains a
+  natural experiment:
+
+  | | pooled AUC | per-session AUC |
+  |---|---|---|
+  | ExtraTrees, behavioural (5) | 0.7201 | 0.6051 |
+  | ExtraTrees, audio (10) | 0.5499 | 0.5038 |
+  | LogReg, behavioural (5) | 0.7082 | 0.5916 |
+  | LogReg, audio (10) | 0.5060 | 0.5068 |
+
+  The behavioural rows lose ~0.11 AUC when scored per session; the audio rows lose
+  almost nothing. That is exactly the signature of `historical_skip_rate` acting
+  as a proxy for session-level base rate — a between-session signal that pooled
+  AUC banks and per-session scoring correctly discards.
+- **Verify before quoting** the ~30.9% between-session variance figure from your
+  earlier analysis; it is the cleanest single number for this argument but it is
+  not currently reproducible from any saved artefact.
+- Cite Zhou et al. (2018) if the per-session/pooled distinction has a source you
+  have read; do not cite it otherwise.
+
+### 7.2 Multi-point splitting (~190 words)
+
+- Each session is scored at up to **five** context/query split points rather than
+  one, and the results are averaged **within** a session before averaging across
+  sessions — so every session contributes equally regardless of length.
+- **The failure this prevents:** with a single split point, a session's score
+  depends on where the draw happened to land. An unlucky split makes a competent
+  model look poor on that session, and with ~12,000 sessions those draws do not
+  simply cancel — they add variance that is indistinguishable from a real
+  difference between models.
+- **`pick()` is deterministic** — five evenly spaced points across the valid
+  range, not a random sample. Evaluation therefore has no seed and no run-to-run
+  variation, so a repeat of `evaluate.py` on the same checkpoints returns
+  identical numbers. Say this: it is a reproducibility guarantee, not an
+  implementation detail.
+- State the constants and what they imply: `MIN_CONTEXT = 3`,
+  `MIN_WINDOW_LENGTH = 5`, so a session needs **at least 8 tracks** to be
+  scorable at all — one more than the 7-track filter in ch. 4 admits.
+
+### 7.3 Metrics (~250 words)
+
+- **NDCG@5 is primary.** State the convention explicitly and early, because it
+  inverts the usual one: the queue is ordered **ascending** by predicted skip
+  probability, and a track is **relevant if it was not skipped**. A reader who
+  assumes the standard convention will misread every figure in ch. 8. Cite
+  Järvelin & Kekäläinen (2002).
+- **AUC secondary**, computed from the Mann-Whitney rank statistic (Hanley &
+  McNeil, 1982) — see ch. 6 for the implementation.
+- **NDCG@10 and P@5** as robustness checks: P@5 is the most directly
+  interpretable — "of the next five tracks this system would play, how many are
+  kept?"
+- **`RankFirstSkip`** — how many tracks play before the listener hits a skip. Give
+  it prominence: it is the only metric stated in units a reader understands
+  without explanation, and it is the quantity a queue reorderer exists to
+  increase.
+- **MRR was measured and dropped.** It spanned only 0.767–0.854 across every model
+  including Random, because with ~62% of tracks unskipped the first kept track is
+  almost always at rank 1. Report that you tested it and rejected it — a metric
+  you evaluated and discarded is worth more than one you never considered.
+- **The random floor belongs here, not only in ch. 8.** NDCG@5 0.6881 and AUC
+  0.5028 on the test set. Every metric needs its floor stated at the point it is
+  defined, so the reader carries it into the results.
+
+### 7.4 Experimental design (~250 words)
+
+*Three stages, and the separation between them is what makes ch. 8 credible.*
+
+- **Tuning** — 1,080 configurations, scored on validation only. State the split
+  per arm and why the arms differ (→ 6.3).
+- **Training** — the selected configuration retrained over **five seeds**, again
+  selecting on validation.
+- **Test** — scored **once**, after all selection was complete. Say this in those
+  words. It is the single most important sentence in the chapter.
+- **The selection metric is NDCG@5 smoothed over a three-epoch window, not the
+  per-epoch maximum.** Give the reason: taking a maximum over epochs is biased
+  upward, because it selects the epoch whose validation noise happened to be
+  favourable. Smoothing removes most of that. Your raw per-epoch value swings by
+  ~0.03, which is larger than the differences being compared.
+- Early stopping on the smoothed metric with patience 5, max 100 epochs.
+- **Identical protocol across all arms** — same batch size, patience, smoothing
+  window, seed count and evaluation code. State the fixed constants explicitly
+  (batch 64, patience 5, window 3, five seeds); an unstated constant reads as
+  something you did not consider.
+- Cite Shehzad & Jannach (2023) on unequal tuning budgets manufacturing wins, if
+  you have read it — and note that your budgets were unequal *by hyperparameter
+  count*, with the two worst arms receiving the largest allocations.
+
+### 7.5 Resolution and significance (~200 words)
+
+- **State the noise floor before any comparison.** Mean seed standard deviation
+  across the six neural arms is ~0.0057 on NDCG@5, so differences below roughly
+  **0.011** (2 sd) are not resolvable by inspection of the means alone.
+- **Significance is by paired bootstrap over per-session scores**, 10,000
+  resamples, not by comparing means to standard deviations. Explain why pairing
+  matters: every model scores the *same* sessions, so the paired difference
+  removes between-session variance, which is the dominant source of spread.
+- Cite Smucker, Allan & Carterette (2007) — bootstrap and randomisation tests are
+  preferred to t-tests for IR evaluation.
+- **State the one comparison you cannot make.** The sklearn baselines scored
+  11,694 sessions to the neural models' 11,695, so baseline-versus-neural
+  differences are **unpaired**. Either reconcile the missing session or report
+  those comparisons without a paired test — do not quietly pair them.
+
+### 7.6 Known limitations of the protocol (~180 words)
+
+*These belong here rather than ch. 8: they are properties of the measurement, not
+of the results.*
+
+- **Scoring begins at the committed slot.** The protocol scores from context
+  length *c* onward, but a deployed reorderer cannot alter the track at *c* — that
+  slot is already playing by the time the reorder completes. The reported figures
+  therefore credit the model for ranking a position it could not control. With
+  `MIN_WINDOW_LENGTH = 5` that is one of at least five positions, and it is the
+  one NDCG discounts least.
+- **No session is scored before its first skip.** `valid_splits` requires at least
+  one skip in the context, because the status channel carries no discriminating
+  signal otherwise. But that is precisely the window in which a deployed system
+  would be asked to act, so cold-start-within-session behaviour is untested.
+- **28.2% of test sessions yield no valid split** and are excluded entirely.
+- **The test distribution differs from training** — skip rate 0.381 / 0.346 /
+  0.356 across the splits, the cost of the chronological split (→ ch. 4).
+
+### Before you write this chapter
+
+- Nothing here requires the re-run. Every constant, condition and justification is
+  readable from the code.
+- Write it **before** ch. 8. A reader who has accepted the protocol reads the
+  results as findings; one who meets the protocol afterwards reads them as claims
+  needing defence.
+- Resist putting any result in it. The random floor is the one exception, because
+  it is a property of the data rather than of a model.
 
 ## 8. Results / Findings and Discussion (~2,000 words) — part of 30%
 
@@ -794,9 +1184,9 @@ already do.
 The nine-row test table is the centrepiece. Put the **Random row at the bottom
 and refer to it in the first sentence.**
 
-| model | AUC | NDCG@5 | NDCG@10 | MRR | P@5 |
+| model | AUC | NDCG@5 | NDCG@10 | P@5 | tracks before 1st skip |
 |---|---|---|---|---|---|
-| SkipLSTM/pwts | 0.6445 ±0.0025 | **0.7865** ±0.0030 | 0.8226 | 0.8540 | 0.6964 |
+| SkipLSTM/pwts | 0.6445 ±0.0025 | **0.7865** ±0.0030 | 0.8226 | 0.6964 | *(re-run)* |
 | SkipLSTM/bce | 0.6427 ±0.0075 | 0.7800 ±0.0050 | 0.8175 | 0.8458 | 0.6913 |
 | SkipLSTM/drrl | **0.6448** ±0.0210 | 0.7782 ±0.0100 | 0.8165 | 0.8457 | 0.6874 |
 | SASRec/pwts | 0.6358 ±0.0024 | 0.7805 ±0.0018 | 0.8168 | 0.8492 | 0.6919 |
@@ -823,9 +1213,17 @@ Points to make, in this order:
   AUC (0.6448) but ranks fourth on NDCG@5 — and its AUC sd is 0.0210, eight times
   PWTS's. Use this to justify having pre-registered NDCG@5 as primary rather than
   picking the metric that flatters a result.
-- **MRR is nearly uninformative here.** It moves only from 0.7671 to 0.8540 across
-  the entire table — the base rate compresses it. Say so; reporting a metric and
-  then explaining why you do not rely on it reads as rigour.
+- **Lead the user-facing claim with `RankFirstSkip`** — the rank of the first
+  skipped track under the model's ordering, i.e. how many tracks play before the
+  listener is interrupted. It is the only metric in the table stated in units a
+  reader understands without explanation, and it is the quantity a queue reorderer
+  exists to increase. Give it against the queue's own order, not only the random
+  floor: "the listener reaches N tracks before a skip as the queue stands, and M
+  once reordered" is the sentence the whole project is for.
+- **MRR was removed** after it proved to span only 0.767–0.854 across every model
+  including Random. Say that it was measured, found not to discriminate, and
+  dropped — a metric you tested and rejected is worth more than one you never
+  considered.
 - Finish with the bootstrap column: which of these gaps survive pairing.
 
 ### 8.3 Loss functions (~300 words)

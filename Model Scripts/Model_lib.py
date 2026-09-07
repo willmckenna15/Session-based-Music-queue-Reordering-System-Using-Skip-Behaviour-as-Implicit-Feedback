@@ -15,9 +15,6 @@ from Loss_functions import get_loss_criterion, parse_args, DrRLLoss, PWTSLoss
 import sys
 
 def _current_loss_name():
-    """Parsed lazily so that importing this module does not require --loss.
-    Scripts with no loss argument (e.g. extra_trees_tuning.py) still need
-    SessionDataset and evaluate_sequential from here."""
     try:
         return parse_args().loss
     except SystemExit:
@@ -98,23 +95,6 @@ def collate_fn(batch):
     return sessions_padded, labels_padded,song_pos_padded, ms_played_padded, track_length_padded,historical_skip_rate_padded, lengths
 
 class LengthBucketSampler(Sampler):
-    """Batch sampler that groups sessions of similar length together.
-
-    collate_fn pads every session in a batch out to the longest one in it, so with
-    randomly composed batches most of the tensor is padding: measured at 6.23x the
-    real token count at batch_size=64, because session lengths span 7 to 807.
-    Grouping similar lengths brings that to 1.01x - a 6.2x reduction in wasted
-    compute, with no change to the data or the objective.
-
-    The ORDER of batches is reshuffled each epoch, so training stays stochastic;
-    only the composition of each batch is fixed. Standard practice in sequence
-    modelling (torchtext BucketIterator, HuggingFace group_by_length, fairseq).
-
-    Caveat worth stating in a write-up: batches become length-homogeneous, so
-    gradient noise is mildly correlated with session length. Apply it uniformly
-    across every model and loss being compared, which is what the tuning scripts do.
-    """
-
     def __init__(self, lengths, batch_size, shuffle=True):
         self.batch_size = batch_size
         self.shuffle = shuffle
@@ -154,12 +134,12 @@ MIN_WINDOW_LENGTH = 5
 def build_attn_mask(seq_len, boundaries, num_heads, device):
     """True = blocked. attn_mask[i, j] blocks query position i from attending key j."""
     idx    = torch.arange(seq_len, device=device)
-    causal = idx.unsqueeze(1) < idx.unsqueeze(0)              # (L,L)  block j > i
-    is_q   = idx.unsqueeze(0) >= boundaries.unsqueeze(1).to(device)      # (N,L)  query positions
-    qq     = is_q.unsqueeze(2) & is_q.unsqueeze(1)            # (N,L,L) query attending query
+    causal = idx.unsqueeze(1) < idx.unsqueeze(0)    
+    is_q   = idx.unsqueeze(0) >= boundaries.unsqueeze(1).to(device)      
+    qq     = is_q.unsqueeze(2) & is_q.unsqueeze(1)            
     eye    = torch.eye(seq_len, dtype=torch.bool, device=device)
-    mask   = causal.unsqueeze(0) | (qq & ~eye)                # keep the diagonal (self)
-    return mask.repeat_interleave(num_heads, dim=0)           # (N*heads, L, L)
+    mask   = causal.unsqueeze(0) | (qq & ~eye)               
+    return mask.repeat_interleave(num_heads, dim=0)           
 
 class SkipLSTM(nn.Module):
     def __init__(self, input_size, hidden_size=64, num_layers=2, dropout=0.3):
@@ -167,26 +147,19 @@ class SkipLSTM(nn.Module):
         self.feature_proj = nn.Linear(input_size, hidden_size)
         self.status_emb   = nn.Embedding(3, hidden_size)
         nn.init.zeros_(self.status_emb.weight[2])
-        # Input dropout so dropout_rate still does something at num_layers=1,
-        # where nn.LSTM ignores its own dropout argument (and warns)
         self.emb_dropout = nn.Dropout(p=dropout)
         self.lstm = nn.LSTM(hidden_size, hidden_size, num_layers,
                             batch_first=True,
                             dropout=dropout if num_layers > 1 else 0.0)
         self.fc       = nn.Linear(hidden_size, 1)
 
-    def forward(self, x, lengths, status, boundaries):   # boundaries deliberately unused
+    def forward(self, x, lengths, status, boundaries): 
         h = self.emb_dropout(self.feature_proj(x) + self.status_emb(status))
         packed = nn.utils.rnn.pack_padded_sequence(h, lengths.cpu(),
                                                    batch_first=True, enforce_sorted=False)
         out, _ = self.lstm(packed)
-        # total_length pins the padded width to the collated width: evaluate_sequential
-        # concatenates per-chunk predictions, and chunks have different max lengths
         out, _ = nn.utils.rnn.pad_packed_sequence(out, batch_first=True,
                                                   total_length=x.shape[1])
-        # logits, not probabilities: DrRL is defined over unbounded ranking scores,
-        # and BCEWithLogitsLoss is the numerically stable form. AUC and NDCG are
-        # rank-based, so the sigmoid would make no difference to them anyway.
         return self.fc(out).squeeze(-1)
 
 class SASRec(torch.nn.Module):
@@ -241,7 +214,6 @@ class SASRec(torch.nn.Module):
 
     def forward(self, x, lengths, status, boundaries):
         feats = self.seq2feats(x, lengths, status, boundaries)
-        # logits, not probabilities - see SkipLSTM.forward
         return self.output_layer(feats).squeeze(-1)
 
 def log_test(row, log_path='../Models/test_log.csv'):
@@ -336,6 +308,22 @@ def pick(cands, points=POINTS_PER_SESSION):
     if len(cands) <= points:
         return cands
     return [cands[k] for k in np.linspace(0, len(cands) - 1, points).astype(int)]
+
+def rank_first_skip(y, p):
+    """How many tracks play before the listener hits a skip, under the model's
+    ordering. Rank of the first skipped track, so higher is better."""
+    order = np.argsort(p, kind='stable')
+    skipped = np.flatnonzero(y[order])
+    # valid_splits guarantees both classes in the window, so this should not fire
+    return float(skipped[0] + 1) if skipped.size else float(len(y) + 1)
+
+
+def precision_at_k(y, p, k):
+    """Fraction of the top-k reordered queue that the listener does not skip.
+    The most directly interpretable metric here: 'of the next k songs this system
+    would play, how many are kept?'"""
+    order = np.argsort(p, kind='stable')[:k]
+    return float((1.0 - y[order]).mean()) if order.size else np.nan
 
 
 def evaluate_sequential(model, loader, device, min_context=MIN_CONTEXT, min_skips_in_context=1,

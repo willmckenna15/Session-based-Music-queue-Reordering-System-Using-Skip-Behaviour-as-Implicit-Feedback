@@ -5,12 +5,7 @@ MIN_SONGS = 7
 
 
 def filter_valid_sessions(df, min_songs=MIN_SONGS):
-    """Same three criteria as before, applied to the dataframe rather than to lists of dicts.
 
-    It has to work on the dataframe now because the filter runs after the audio join, where the
-    data is already tabular. Re-run it after any step that drops rows, or the length guarantee
-    silently stops holding.
-    """
     g = df.groupby("session_id")
     keep = (
         (g["session_id"].transform("size") >= min_songs) &

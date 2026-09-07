@@ -67,14 +67,8 @@ with open(params_path, 'r') as f:
 print(f"Loaded best params: {best_params}")
 print(f"Feature set: {feature_set} ({len(features)} features)")
 
-# Ablation runs write their own checkpoints so they cannot clobber the 15-feature
-# ones that evaluate.py reads
-TAG = '' if feature_set == 'all' else f'_{feature_set.replace("-", "")}'
 
-# NOTE for interpretation: the status channel (status_emb) carries observed skip
-# outcomes and is NOT part of `features`, so an "audio-only" model here still
-# receives skip momentum. It is not audio-only in the sense the sklearn baselines
-# are - those are the clean test of the research question.
+TAG = '' if feature_set == 'all' else f'_{feature_set.replace("-", "")}'
 
 print("Loading datasets...")
 train_dataset = SessionDataset('../RAW Data/training_data.parquet', features, target)
@@ -164,13 +158,10 @@ for seed in range(N_RUNS):
     runs.append(result)
     print(f"Run {seed+1}: NDCG {result['val_ndcg']:.4f} | AUC {result['val_auc']:.4f} "
           f"| best epoch {result['epoch']} of {result['epochs_run']}")
-    # every seed is kept: evaluate.py averages the test metrics over them, which is
-    # what puts error bars on the final comparison
     torch.save(state, f'../Models/lstm_{loss_name}{TAG}_seed{seed}.pt')
     if result['val_ndcg'] > best_overall[0]:
         best_overall = (result['val_ndcg'], state)
 
-# Also save the best seed under a stable name
 torch.save(best_overall[1], f'../Models/lstm_{loss_name}{TAG}_best.pt')
 
 ndcgs = np.array([r['val_ndcg'] for r in runs])

@@ -12,6 +12,11 @@ import numpy as np
 import pandas as pd
 import torch
 
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                '..', 'Model Scripts'))
+
 from Model_lib import SkipLSTM, ndcg_at_k, fast_auc, valid_splits, pick
 
 FEATURES = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
@@ -24,7 +29,7 @@ DATA = '../RAW Data/testing_data.parquet'
 
 cli = argparse.ArgumentParser()
 cli.add_argument('--session', default=None)
-cli.add_argument('--context', type=int, default=10)
+cli.add_argument('--context', type=int, default=13)
 cli.add_argument('--min-len', type=int, default=20)
 cli.add_argument('--max-len', type=int, default=40)
 cli.add_argument('--pick-seed', type=int, default=None)

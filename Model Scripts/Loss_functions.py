@@ -34,10 +34,6 @@ class DrRLLoss(nn.Module):
         self.beta_optimizer.zero_grad()
         loss_beta.backward()
         self.beta_optimizer.step()
-        # beta is an nn.Parameter, so it is also handed to the main Adam optimiser via
-        # criterion.parameters(). Without this, the gradient left here is picked up by
-        # the following optimizer.step() and beta is stepped a second time, at Adam's
-        # learning rate - measured at ~166x the intended SGD step.
         self.beta.grad = None
 
     def forward(self, preds, skip):

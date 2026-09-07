@@ -25,8 +25,13 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader, Subset
 
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                '..', 'Model Scripts'))
+
 from Model_lib import (SessionDataset, collate_fn, SASRec, SkipLSTM,
-                       valid_splits, pick, fast_auc, ndcg_at_k,
+                       valid_splits, pick, fast_auc, ndcg_at_k, rank_first_skip, precision_at_k,
                        MIN_CONTEXT, MIN_WINDOW_LENGTH, POINTS_PER_SESSION)
 
 features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
@@ -43,6 +48,8 @@ cli = argparse.ArgumentParser()
 cli.add_argument('--split', default='testing', choices=['testing', 'validation'])
 cli.add_argument('--no-baselines', action='store_true')
 cli.add_argument('--out', default='../Models/final_results.csv')
+cli.add_argument('--report-out', default='../Report/final_results_table.csv',
+                 help='Presentation-ready copy: mean +/- sd in one cell per metric')
 opts = cli.parse_args()
 
 DATA = f'../RAW Data/{opts.split}_data.parquet'
@@ -55,52 +62,20 @@ else:
     device = torch.device("cpu")
 
 
-##Metrics
-
-def mrr(y, p):
-    """Reciprocal rank of the first track the listener does NOT skip, under the
-    model's ordering (ascending by predicted skip probability).
-
-    Note this saturates on this dataset: ~62% of tracks are not skipped, so the
-    first kept track is usually at rank 1 or 2 and MRR sits near 0.9 for every
-    model, including a random one. Reported because it is conventional, but
-    prec@k discriminates far better here.
-    """
-    order = np.argsort(p, kind='stable')
-    kept = np.flatnonzero(1.0 - y[order])
-    return 1.0 / (kept[0] + 1) if kept.size else 0.0
-
-
-def precision_at_k(y, p, k):
-    """Fraction of the top-k reordered queue that the listener does not skip.
-    The most directly interpretable metric here: 'of the next k songs this system
-    would play, how many are kept?'"""
-    order = np.argsort(p, kind='stable')[:k]
-    return float((1.0 - y[order]).mean()) if order.size else np.nan
-
-
 def window_metrics(y, p):
     return {
         'AUC':      fast_auc(y, p),
         'NDCG@5':   ndcg_at_k(y, p, 5),
         'NDCG@10':  ndcg_at_k(y, p, 10),
-        'MRR':      mrr(y, p),
         'P@5':      precision_at_k(y, p, 5),
+        'RankFirstSkip': rank_first_skip(y, p),
     }
 
 
-METRICS = ['AUC', 'NDCG@5', 'NDCG@10', 'MRR', 'P@5']
+METRICS = ['AUC', 'NDCG@5', 'NDCG@10', 'P@5', 'RankFirstSkip']
 
 
 def aggregate(per_session):
-    """per_session: {session_id: [dict_of_metrics, ...]} -> mean per metric, plus
-    per-session arrays ordered by session_id.
-
-    Keying and sorting by session_id (not position) is what makes the saved arrays
-    comparable across models: the neural path iterates a length-sorted loader while
-    the sklearn path groups by session_id, so positional alignment would silently
-    pair different sessions in a paired test.
-    """
     keys = sorted(per_session)
     arrays = {m: np.array([np.mean([w[m] for w in per_session[k]]) for k in keys])
               for m in METRICS}
@@ -210,7 +185,6 @@ def load_neural(kind, loss):
     return out
 
 
-##Baselines - neither script persists its model, so refit here
 
 def baseline_predictions():
     from sklearn.ensemble import ExtraTreesClassifier
@@ -276,9 +250,6 @@ for kind in ('SASRec', 'SkipLSTM'):
             print(f"skip {kind}/{loss}: no checkpoint")
             continue
         print(f"{kind}/{loss}: {len(models)} checkpoint(s)")
-        # Per-session scores are accumulated across seeds, not taken from the last
-        # one: the table reports the seed mean, so the arrays a paired test runs on
-        # have to be the seed mean too or the test is not testing the table.
         seed_means, acc, acc_keys = [], None, None
         for label, m in models:
             means, arrays, keys = eval_neural(m)
@@ -310,6 +281,17 @@ cols = ['model', 'n_seeds', 'sessions'] + \
        [c for m in METRICS for c in (m, f'{m}_sd') if c in df.columns]
 df = df[[c for c in cols if c in df.columns]]
 df.to_csv(opts.out, index=False)
+table = pd.DataFrame({'Model': df['model'], 'Seeds': df['n_seeds'],
+                      'Sessions': df['sessions']})
+for m in METRICS:
+    sd = f'{m}_sd'
+    if sd in df.columns:
+        table[m] = [f'{v:.4f} \u00b1 {e:.4f}' if pd.notna(e) else f'{v:.4f}'
+                    for v, e in zip(df[m], df[sd])]
+    else:
+        table[m] = [f'{v:.4f}' for v in df[m]]
+os.makedirs(os.path.dirname(opts.report_out), exist_ok=True)
+table.to_csv(opts.report_out, index=False)
 
 np.savez_compressed('../Models/eval_per_session.npz',
                     session_ids=np.array(session_keys, dtype=object), **per_session_store)
@@ -317,4 +299,5 @@ np.savez_compressed('../Models/eval_per_session.npz',
 print(f"\n{'='*78}\nTEST RESULTS ({opts.split} set, {len(dataset)} sessions)\n{'='*78}")
 print(df.to_string(index=False))
 print(f"\nWritten to {opts.out}")
+print(f"Report table   -> {opts.report_out}")
 print("Per-session scores -> ../Models/eval_per_session.npz (for paired tests)")
