@@ -61,10 +61,6 @@ train_dataset = SessionDataset('../RAW Data/training_data.parquet', features, ta
 val_dataset = SessionDataset('../RAW Data/validation_data.parquet', features, target)
 print(f"Train sessions: {len(train_dataset)} | Val sessions: {len(val_dataset)}")
 
-# Evaluate in length-sorted order. Batches pad to their own longest session, and
-# validation lengths span 7 to 786, so most of the forward pass is padding - sorting
-# removes ~2.6x of it. The score is unchanged: evaluate_sequential averages within
-# each session before averaging across sessions, so batch composition is irrelevant.
 val_order = np.argsort([len(y) for y in val_dataset.labels]).tolist()
 val_eval_dataset = Subset(val_dataset, val_order)
 

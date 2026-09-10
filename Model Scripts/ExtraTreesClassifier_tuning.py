@@ -37,9 +37,6 @@ Y = training_df[target]
 X_val = validation_df[features]
 Y_val = validation_df[target]
 
-# Session structure is the same for every config - only the predictions change,
-# so enumerate the split points once rather than 36 times
-print("Indexing validation sessions...")
 sessions = []
 for _, g in validation_df.sort_values('ts').groupby('session_id', sort=False):
     y = g[target].to_numpy()

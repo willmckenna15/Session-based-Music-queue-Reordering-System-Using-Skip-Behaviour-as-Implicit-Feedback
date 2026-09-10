@@ -98,16 +98,16 @@ print(f"\nSession {sid}")
 print(f"{L} tracks | context {b} played | {L-b} in the queue | "
       f"model: SkipLSTM/PWTS ({params['hidden_units']:.0f} units)\n")
 
-print("CONTEXT — already played")
+print("CONTEXT already played")
 for i in range(b):
     print(f"  {i+1:>2}. {s['Track Name'][i][:34]:<34} {s['Artist Name'][i][:20]:<20} "
           f"{'SKIPPED' if y[i] else 'played'}")
 
-print("\nQUEUE — original order" + " " * 42 + "P(skip)   actual")
+print("\nQUEUE original order" + " " * 42 + "P(skip)   actual")
 for i, (n, pr, a) in enumerate(zip(names, p, yq)):
     print(f"  {i+1:>2}. {n:<56} {pr:.3f}    {'SKIPPED' if a else 'played'}")
 
-print("\nQUEUE — reordered by the model" + " " * 33 + "P(skip)   actual")
+print("\nQUEUE reordered by the model" + " " * 33 + "P(skip)   actual")
 for rank, j in enumerate(order):
     flag = ' <-' if rank < 5 and yq[j] == 0 else ''
     print(f"  {rank+1:>2}. {names[j]:<56} {p[j]:.3f}    "
