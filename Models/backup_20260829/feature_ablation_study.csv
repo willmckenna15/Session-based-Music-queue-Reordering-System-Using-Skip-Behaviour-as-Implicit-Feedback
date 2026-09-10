@@ -1,7 +1,0 @@
-model,feature_set,n_features,pooled_auc,session_auc,session_ndcg5,n_sessions,split,timestamp
-LogReg,audio-only,10,0.506,0.5068,0.6963,12011,validation,2026-08-29 14:31:52.397245
-LogReg,behavioural-only,5,0.7082,0.5916,0.7531,12014,validation,2026-08-29 14:31:57.525147
-LogReg,all,15,0.7081,0.5942,0.7584,12011,validation,2026-08-29 14:32:03.374730
-ExtraTrees,audio-only,10,0.5499,0.5038,0.6938,12011,validation,2026-08-29 14:40:02.463732
-ExtraTrees,behavioural-only,5,0.7201,0.6051,0.7707,12014,validation,2026-08-29 14:40:20.961088
-ExtraTrees,all,15,0.7159,0.6029,0.7691,12011,validation,2026-08-29 14:40:42.028752

@@ -1,2 +1,0 @@
-variant,position,time,historical,decay,start,thresh,mid,steep,changed_from_default,n_seeds,val_ndcg_mean,val_ndcg_std,val_auc_mean,val_auc_std,epochs_run,best_epoch,timestamp
-mid_0.2,True,True,True,3.0,2.0,0.1,0.2,6.0,"{""mid"": 0.2}",3,0.7929,0.0007,0.6428,0.0024,"[23, 23, 22]","[18, 18, 17]",2026-08-16 18:57:09.178955
