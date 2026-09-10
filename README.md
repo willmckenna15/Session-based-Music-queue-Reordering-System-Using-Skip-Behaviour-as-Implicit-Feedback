@@ -1,5 +1,8 @@
 # Session-based-Music-queue-Reordering-System-Using-Skip-Behaviour-as-Implicit-Feedback
 
+## Summary of Work
+The aim of this research to is to produce a model that will rank the unplayed tracks in a listening queue, based on the outputted skip-probabilities. These skip-probabilities will be inferred using various audio and behavioural features present in the already played tracks (context). Four different models (with increasing complexity) will be evaluated over three loss functions to deduce what combination fits most accurately for this scenario. Further analysis will then be conducted to highlight the impact of contextual length on the results.
+
 ## Repository Layout 
 
 | Directory | Contents |
