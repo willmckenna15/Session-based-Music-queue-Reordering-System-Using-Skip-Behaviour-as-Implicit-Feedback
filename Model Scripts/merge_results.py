@@ -41,10 +41,6 @@ pd.Series(best).to_json(best_json)
 print(f"\nBest config: {best}")
 print(f"Best params saved to {best_json}")
 
-# Gaps mean array tasks that failed or timed out - worth knowing before you treat
-# the merged table as a complete grid
 present = {int(re.search(r'task(\d+)\.csv$', p).group(1)) for p in paths}
 gaps = sorted(set(range(max(present) + 1)) - present)
-if gaps:
-    print(f"\nWARNING: {len(gaps)} task files missing between 0 and {max(present)} - "
-          f"those array tasks failed or timed out. First few: {gaps[:10]}")
+

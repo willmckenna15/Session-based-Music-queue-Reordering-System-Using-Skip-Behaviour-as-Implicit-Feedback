@@ -5,14 +5,7 @@ from matplotlib import pyplot
 from sklearn.linear_model import LogisticRegression
 # same metric definitions the sequence models are scored on, so the numbers compare
 from Model_lib import ndcg_at_k, valid_splits, pick, fast_auc
-import argparse
 import os
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--feature-set', type=str, default='all', 
-                    choices=['all', 'audio-only', 'behavioural-only'],
-                    help='Which features to use')
-args = parser.parse_args()
 
 audio_features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 
                   'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence']
@@ -22,14 +15,9 @@ behavioural_features = ['historical_skip_rate', 'historical_artist_skip_rate',
 
 all_features = audio_features + behavioural_features
 
-if args.feature_set == 'audio-only':
-    features = audio_features
-elif args.feature_set == 'behavioural-only':
-    features = behavioural_features
-else:
-    features = all_features
+features = all_features
 
-print(f"Using {args.feature_set}: {len(features)} features")
+print(f"Using {len(features)} features")
 
 training_file = '../RAW Data/training_data.parquet'
 validation_file = '../RAW Data/validation_data.parquet'
@@ -63,9 +51,6 @@ probs = probs[:, 1]
 auc = roc_auc_score(Y_val, probs)
 print('Pooled AUC: %.4f' % auc)
 
-# Per-session scoring - the protocol Model_lib.evaluate_sequential uses, so these
-# numbers sit in the same table as SASRec/SkipLSTM. Pooled AUC is a different
-# quantity and the two are not interchangeable.
 session_aucs, session_ndcgs = [], []
 for _, g in validation_df.sort_values('ts').groupby('session_id', sort=False):
     y, p = g[target].to_numpy(), probs[g.index.to_numpy()]
@@ -80,10 +65,9 @@ print(f'Per-session AUC:    {np.mean(session_aucs):.4f}')
 print(f'Per-session NDCG@5: {np.mean(session_ndcgs):.4f} across {len(session_aucs)} sessions')
 
 
-OUT = '../Models/feature_ablation_study.csv'
+OUT = '../Models/baseline_results.csv'
 row = pd.DataFrame([{
     'model': 'LogReg',
-    'feature_set': args.feature_set,
     'n_features': len(features),
     'pooled_auc': round(auc, 4),
     'session_auc': round(float(np.mean(session_aucs)), 4),

@@ -7,9 +7,7 @@ import glob
 import feature_and_filter
 
 print("removing pre-existing files...")
-# Each deletion is guarded separately. Previously one try/except wrapped them all, so a single
-# already-missing file aborted the rest and left stale parquets behind for the next stage to
-# read.
+
 stale = (glob.glob("../RAW Data/Streaming_history_*.csv")
          + glob.glob("../RAW Data/*.parquet")
          + ["../RAW Data/Combined_Streaming_History.csv", "../Session Data.csv"])

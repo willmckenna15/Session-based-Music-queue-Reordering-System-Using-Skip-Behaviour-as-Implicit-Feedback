@@ -7,6 +7,12 @@ Spotify Extended Streaming Histories
 Volunteer Data
 ~$Data Collection.xlsx
 !Models/*_best_params.json
+Data Scripts/individual_audio_feature.py
+Data Scripts/Project_Json2csv_indi.py
+Data Scripts/Streaming_History_stats.py
+Data Scripts/Volunteer_stats.py
+adhoc_analysis.py
+Session Data.csv
 
 # Working notes (not for submission)
 Info/AUC Diagnosis and Action Plan.md

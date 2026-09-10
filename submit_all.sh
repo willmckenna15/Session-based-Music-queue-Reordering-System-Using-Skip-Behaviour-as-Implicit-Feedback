@@ -1,14 +1,3 @@
-#!/bin/bash
-# Submit every tuning arm as a SLURM job array, plus a merge job per arm that runs
-# automatically once its array finishes.
-#
-#   ./submit_all.sh              submit everything (1080 tasks)
-#   ./submit_all.sh --dry-run    print what would be submitted, submit nothing
-#   ./submit_all.sh bce          only the bce arms
-#
-# Array sizes: drrl adds gamma(3) as a third axis, so its grids are 3x larger.
-#   LSTM   bce/pwts  3x3x3x2   =  54     LSTM   drrl  162
-#   SASRec bce/pwts  3x3x3x3x2 = 162     SASRec drrl  486
 
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -38,8 +27,7 @@ submit () {
     jid=$(sbatch --parsable --array=0-"$last" "$script" "$loss")
     printf '  %-16s %-5s array 0-%-3s  job %s\n' "$script" "$loss" "$last" "$jid"
 
-    # afterany, not afterok: merge whatever completed even if some tasks failed -
-    # merge_results.py reports which task files are missing
+
     sbatch --parsable \
            --dependency=afterany:"$jid" \
            --job-name="merge_${model}_${loss}" \

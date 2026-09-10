@@ -9,9 +9,6 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 from datetime import timedelta
 from openpyxl.styles import PatternFill
 
-
-# ── Analysis function ─────────────────────────────────────────────────────────
-
 def analyse(f_df, a_df, skip_no):
 
     most_listened_songs = (
@@ -273,9 +270,6 @@ def analyse(f_df, a_df, skip_no):
         "Plays by Month": Month_analysis,
     }
 
-
-# ── Side by side writer ───────────────────────────────────────────────────────
-
 def write_side_by_side(worksheet, df_left, df_right, gap=2):
     left_cols = len(df_left.columns)
     right_start_col = left_cols + gap + 1
@@ -300,8 +294,6 @@ def write_side_by_side(worksheet, df_left, df_right, gap=2):
         for c_idx, value in enumerate(row, 1):
             worksheet.cell(row=r_idx, column=c_idx + col_offset, value=value)
 
-
-# ── Formatting ────────────────────────────────────────────────────────────────
 
 def format_sheet(worksheet, df_left, df_right, gap=2):
     thin = Side(style="thin")
@@ -373,9 +365,6 @@ def format_pct_column(worksheet, col_name, df, col_offset=0):
             for row in range(3, len(df) + 3):
                 worksheet.cell(row=row, column=cell.column + col_offset).number_format = '0.00"%"'
             break
-
-
-# ── Main ──────────────────────────────────────────────────────────────────────
 
 def main(user_id):
     while True:

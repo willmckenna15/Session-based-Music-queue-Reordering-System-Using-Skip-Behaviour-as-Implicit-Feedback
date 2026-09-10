@@ -1,16 +1,4 @@
 """Final evaluation of all eight models on the held-out test set.
-
-Every model is scored under one protocol: for each session, enumerate the valid
-context/query split points, take up to five evenly spaced, score the query window at
-each, average within the session, then average across sessions. That is the same
-procedure used for tuning and training, so the numbers are comparable throughout.
-
-    python evaluate.py                 # test set (default)
-    python evaluate.py --split val     # sanity check against training-run numbers
-    python evaluate.py --no-baselines  # skip refitting ExtraTrees/LogReg
-
-Per-session scores are written to ../Models/eval_per_session.npz so paired
-significance tests can be run afterwards without re-evaluating.
 """
 
 import argparse
@@ -136,7 +124,6 @@ def eval_neural(model):
     return aggregate(per_session)
 
 
-##Flat (sklearn) evaluation - predictions do not depend on the split point
 
 def eval_flat(probs_by_session):
     """probs_by_session: {session_id: (y, p)} - predictions do not depend on the

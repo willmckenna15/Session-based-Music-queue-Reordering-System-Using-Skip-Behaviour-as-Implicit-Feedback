@@ -94,33 +94,3 @@ print(results_df.to_string(index=False))
 best_params = results_df.iloc[0].to_dict()
 print(f"\nBest config: {best_params}")
 print(f"Results saved to {RESULTS_CSV}")
-'''
-print("Training Model...")
-model = ExtraTreesClassifier(random_state = 42, min_samples_leaf=10, max_depth = 15, n_estimators=300)
-
-model.fit(X, Y)
-print("Model trained")
-
-print("Validating model...")
-probs = model.predict_proba(X_val)
-probs = probs[:, 1]
-
-print("Calculating importances...")
-importances = model.feature_importances_
-print("--- Feature Importances ---")
-for i in range(len(features)):
-    print(f"{features[i]}: {importances[i]}")
-
-print("Calculating AUC-ROC score...")
-auc = roc_auc_score(Y_val, probs)
-print('AUC: %.3f' % auc)
-
-
-'''
-
-'''
-fpr, tpr, thresholds = roc_curve(Y_val, probs)
-pyplot.plot([0, 1], [0, 1], linestyle='--')
-pyplot.plot(fpr, tpr, marker='.')
-pyplot.show()
-'''

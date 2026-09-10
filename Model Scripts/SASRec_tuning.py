@@ -35,10 +35,6 @@ def handle_interrupt(sig, frame):
     else:
         print("Invalid choice, resuming run...")
 
-# input() raises EOFError in a batch job with no stdin, which would kill the run
-if sys.stdin.isatty():
-    signal.signal(signal.SIGINT, handle_interrupt)
-
 features = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
             'acousticness', 'instrumentalness', 'liveness', 'valence',
             'historical_skip_rate',
@@ -56,9 +52,6 @@ train_dataset = SessionDataset('../RAW Data/training_data.parquet', features, ta
 val_dataset = SessionDataset('../RAW Data/validation_data.parquet', features, target)
 print(f"Train sessions: {len(train_dataset)} | Val sessions: {len(val_dataset)}")
 
-# Evaluate in length-sorted order so batches stop padding to their longest session.
-# Measured 1.15x here at hidden_units=64/num_heads=4; the score is unchanged, since
-# evaluate_sequential averages within each session before averaging across sessions.
 val_order = np.argsort([len(y) for y in val_dataset.labels]).tolist()
 val_eval_dataset = Subset(val_dataset, val_order)
 
@@ -95,9 +88,6 @@ print(f"\nRunning grid search over {len(combinations)} combinations...\n")
 
 completed_csv = f'../Models/sasrec_grid_search_{loss_name}_results.csv'
 
-# Inside a job array each task owns one config and its own results file - a shared
-# CSV would be clobbered by concurrent writes, and the resume logic below would
-# make tasks skip each other's work. Merge afterwards with merge_results.py.
 if TASK_ID >= 0:
     if TASK_ID >= len(combinations):
         print(f"Task {TASK_ID} exceeds {len(combinations)} combinations - nothing to do.")
@@ -116,9 +106,6 @@ else:
 
 combinations_completed = 0
 
-# NDCG@5 swings ~0.03 between adjacent epochs - more than the spread across the whole
-# grid - so selecting on a raw per-epoch maximum largely selects which epoch got lucky,
-# and favours configs that run more epochs. Select on a moving average instead.
 SMOOTH_WINDOW = 3
 PATIENCE = 5
 
@@ -133,8 +120,6 @@ for combo in combinations:
 
     max_epochs = lr_to_epochs[params['lr']]
 
-    # Length-bucketed batches: 6.2x less padded compute than random batching, with
-    # batch order reshuffled each epoch so training stays stochastic
     train_loader = DataLoader(train_dataset, collate_fn=collate_fn,
                               batch_sampler=LengthBucketSampler(train_lengths, BATCH_SIZE))
     val_loader = DataLoader(val_eval_dataset, batch_size=BATCH_SIZE, shuffle=False,
@@ -214,8 +199,6 @@ print(results_df.to_string(index=False))
 best_params = results_df.iloc[0].to_dict()
 print(f"\nBest config: {best_params}")
 
-# If best_epoch sits close to epochs_run, patience is cutting runs off while they are
-# still improving; if epochs_run hits max_epochs, the cap is the binding constraint.
 if 'epochs_run' in results_df:
     at_cap = int((results_df.epochs_run >= results_df.max_epochs).sum())
     still_climbing = int((results_df.best_epoch >= results_df.epochs_run - 1).sum())

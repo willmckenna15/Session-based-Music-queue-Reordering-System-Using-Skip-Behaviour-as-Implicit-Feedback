@@ -48,10 +48,6 @@ def handle_interrupt(sig, frame):
         print("Invalid choice, resuming run...")
 
 
-# input() raises EOFError in a batch job with no stdin, which would kill the run
-if sys.stdin.isatty():
-    signal.signal(signal.SIGINT, handle_interrupt)
-
 if torch.cuda.is_available():
     device = torch.device("cuda")
 elif torch.backends.mps.is_available():
@@ -79,8 +75,6 @@ os.makedirs('../Models', exist_ok=True)
 
 ##Grid search
 
-# num_blocks/num_heads are attention concepts with no LSTM equivalent; depth is
-# num_layers instead, so the grid is 54 combinations rather than SASRec's 162.
 param_grid = {
     'hidden_units': [64, 128, 256],
     'dropout_rate': [0.1, 0.3, 0.5],
@@ -100,9 +94,6 @@ keys = list(param_grid.keys())
 combinations = list(itertools.product(*param_grid.values()))
 print(f"\nRunning grid search over {len(combinations)} combinations...\n")
 
-# Inside a job array each task owns one config and its own results file - a shared
-# CSV would be clobbered by concurrent writes, and the resume logic below would
-# make tasks skip each other's work. Merge afterwards with merge_results.py.
 if TASK_ID >= 0:
     if TASK_ID >= len(combinations):
         print(f"Task {TASK_ID} exceeds {len(combinations)} combinations - nothing to do.")
@@ -121,9 +112,6 @@ else:
 
 combinations_completed = 0
 
-# NDCG@5 swings ~0.03 between adjacent epochs - more than the spread across the whole
-# grid - so selecting on a raw per-epoch maximum largely selects which epoch got lucky,
-# and favours configs that run more epochs. Select on a moving average instead.
 SMOOTH_WINDOW = 3
 PATIENCE = 5
 
@@ -138,14 +126,10 @@ for combo in combinations:
 
     max_epochs = lr_to_epochs[params['lr']]
 
-    # Seed before anything stochastic is constructed - weight init, DataLoader
-    # shuffle, dropout masks and the per-epoch boundary draw all read global RNG
     torch.manual_seed(SEED)
     np.random.seed(SEED)
     random.seed(SEED)
 
-    # Length-bucketed batches: 6.2x less padded compute than random batching, with
-    # batch order reshuffled each epoch so training stays stochastic
     train_loader = DataLoader(train_dataset, collate_fn=collate_fn,
                               batch_sampler=LengthBucketSampler(train_lengths, BATCH_SIZE))
     val_loader = DataLoader(val_eval_dataset, batch_size=BATCH_SIZE, shuffle=False,

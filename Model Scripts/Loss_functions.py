@@ -2,15 +2,18 @@ import torch
 import torch.nn as nn
 import argparse
 
+"""
+DrRLLoss reimplements the objective of Zhang et al. (2025) for per-track binary
+skip prediction. It follows the reference implementation
+(https://github.com/cynthia-shengjia/AAAI-2025-DrRL, optimizer/optim_DrRL.py) in
+structure only -- the conjugate exponent, the epsilon floor, and the separate SGD
+step over the dual variable -- and shares no code with it. It differs in using a
+scalar threshold rather than a per-user margin vector, scaling by the divergence
+budget rather than the number of sampled negatives, a mean logit rather than a
+hinge on positives, and a power mean over the batch rather than a per-user norm.
+"""
 
 class DrRLLoss(nn.Module):
-    """Distributionally robust ranking loss (Renyi divergence over negatives).
-
-    Consumes LOGITS. The method is derived over unbounded ranking scores; applied to
-    sigmoid outputs confined to [0,1] the objective saturates and gradients vanish as
-    the model grows confident, which characterises the implementation rather than the
-    loss.
-    """
 
     def __init__(self, gamma=2.0, eta=0.1, eps=1e-1):
         super(DrRLLoss, self).__init__()
@@ -73,7 +76,6 @@ class PWTSLoss(nn.Module):
 
 def get_loss_criterion(loss_name, gamma=2.0, eta=0.1, active_scalar = 2.0):
     if loss_name == 'bce':
-        # WithLogits: the models emit logits, and this is the stable log-sum-exp form
         return nn.BCEWithLogitsLoss()
     elif loss_name == 'drrl':
         return DrRLLoss(gamma=gamma, eta=eta)
@@ -86,6 +88,6 @@ def get_loss_criterion(loss_name, gamma=2.0, eta=0.1, active_scalar = 2.0):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--loss', type=str, required=True, choices=['bce', 'drrl', 'pwts'])
-    parser.add_argument('--experiment', type=str, default='unnamed', help='Name for this ablation run')
+    parser.add_argument('--experiment', type=str, default='unnamed', help='Name for this run')
     args, _ = parser.parse_known_args()
     return args

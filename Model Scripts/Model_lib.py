@@ -57,9 +57,6 @@ class SessionDataset(Dataset):
         self.ms_played = []
         self.track_length = []
         self.historical_skip_rate = []
-        # kept so evaluation can key per-session scores by identity rather than
-        # position - different scripts iterate sessions in different orders, and
-        # paired significance tests need the rows to line up
         self.session_ids = []
 
         for session_id, session in df.groupby("session_id"):
@@ -114,6 +111,18 @@ class LengthBucketSampler(Sampler):
 
 ##Model
 
+"""
+The SASRec implementation below is adapted from SASRec.pytorch by Zan Huang
+(https://github.com/pmixer/SASRec.pytorch), licensed under Apache-2.0, itself a
+PyTorch port of Kang and McAuley (2018). Modified by the author: the item
+embedding table is replaced by a linear projection over track features; a
+three-state status embedding is added; the causal mask is replaced by the
+context/query mask in build_attn_mask; the dot-product output head becomes a
+linear layer emitting one logit per position; negative sampling is removed.
+"""
+
+# Unchanged from SASRec.pytorch (Huang, 2020), Apache-2.0:
+# https://github.com/pmixer/SASRec.pytorch/blob/main/python/model.py
 class PointWiseFeedForward(torch.nn.Module):
     def __init__(self, hidden_units, dropout_rate):
         super(PointWiseFeedForward, self).__init__()
@@ -197,6 +206,9 @@ class SASRec(torch.nn.Module):
         seqs = self.emb_dropout(seqs)
         tl = seq_len
         attn_mask = build_attn_mask(tl, boundaries, self.num_heads, self.dev)
+
+        # Attention-block loop unchanged from SASRec.pytorch (Huang, 2020),
+        # Apache-2.0; only the mask passed to attn_mask differs.
         for i in range(len(self.attention_layers)):
             seqs = torch.transpose(seqs, 0, 1)
             if self.norm_first:
@@ -228,8 +240,6 @@ def log_test(row, log_path='../Models/test_log.csv'):
 def train_epoch(model, loader, optimizer, criterion, device, loss_name='bce'):
     model.train()
     total_loss = 0
-    # disable when not a terminal: tqdm's carriage returns turn a SLURM .out file
-    # into a single unreadable line
     progress = tqdm(loader, desc="Training", leave=False, disable=not sys.stderr.isatty())
     for sessions, labels, song_pos, ms_played, track_length, historical_skip_rate, lengths in progress:
         sessions, labels = sessions.to(device), labels.to(device)
@@ -273,7 +283,6 @@ def train_epoch(model, loader, optimizer, criterion, device, loss_name='bce'):
 
 
 def valid_splits(y, length, min_context=MIN_CONTEXT, min_skips=1, min_window=MIN_WINDOW_LENGTH):
-    """Every context length at which this session can legitimately be scored."""
     return [c for c in range(min_context, length - min_window + 1)
             if y[:c].sum() >= min_skips and len(np.unique(y[c:length])) >= 2]
 
@@ -281,10 +290,6 @@ POINTS_PER_SESSION = 5
 NDCG_K =5
 
 def fast_auc(y, p):
-    """AUC via the Mann-Whitney statistic. Identical to roc_auc_score to machine
-    precision, ~14x faster - it skips per-call input validation and never builds
-    the ROC curve. rankdata handles tied predictions by averaging ranks, which is
-    what roc_auc_score does too."""
     n_pos = int(y.sum())
     n_neg = len(y) - n_pos
     if n_pos == 0 or n_neg == 0:
@@ -319,9 +324,7 @@ def rank_first_skip(y, p):
 
 
 def precision_at_k(y, p, k):
-    """Fraction of the top-k reordered queue that the listener does not skip.
-    The most directly interpretable metric here: 'of the next k songs this system
-    would play, how many are kept?'"""
+    """Fraction of the top-k reordered queue that the listener does not skip."""
     order = np.argsort(p, kind='stable')[:k]
     return float((1.0 - y[order]).mean()) if order.size else np.nan
 
@@ -336,7 +339,7 @@ def evaluate_sequential(model, loader, device, min_context=MIN_CONTEXT, min_skip
         for sessions, labels, song_pos, ms_played, track_length, hsr, lengths in loader:
             B = sessions.shape[0]
 
-            # 1. enumerate split points; a session is dropped only if NONE are valid
+            # 1. enumerate split points; a session is dropped only if none are valid
             rows = []
             for i in range(B):
                 length = int(lengths[i])
@@ -365,7 +368,7 @@ def evaluate_sequential(model, loader, device, min_context=MIN_CONTEXT, min_skip
                 preds.append(p.cpu())
             preds = torch.cat(preds, dim=0)
 
-            # 4. score each window, then average WITHIN session before averaging across sessions
+            # 4. score each window, then average within session before averaging across sessions
             g_auc, g_ndcg = {}, {}
             for r, (i, c) in enumerate(rows):
                 length = int(lengths[i])
@@ -387,7 +390,7 @@ def evaluate_sequential_tuning(model, loader, device, min_context=MIN_CONTEXT, m
         for sessions, labels, song_pos, ms_played, track_length, hsr, lengths in loader:
             B = sessions.shape[0]
 
-            # 1. enumerate split points; a session is dropped only if NONE are valid
+            # 1. enumerate split points; a session is dropped only if none are valid
             rows = []
             for i in range(B):
                 length = int(lengths[i])
@@ -416,7 +419,7 @@ def evaluate_sequential_tuning(model, loader, device, min_context=MIN_CONTEXT, m
                 preds.append(p.cpu())
             preds = torch.cat(preds, dim=0)
 
-            # 4. score each window, then average WITHIN session before averaging across sessions
+            # 4. score each window, then average within session before averaging across sessions
             g_ndcg = {}
             for r, (i, c) in enumerate(rows):
                 length = int(lengths[i])

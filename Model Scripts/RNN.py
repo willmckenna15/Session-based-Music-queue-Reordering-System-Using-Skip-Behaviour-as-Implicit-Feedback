@@ -1,7 +1,4 @@
 """Final training for SkipLSTM using the tuned hyperparameters.
-
-Mirrors SASRec.py so the two are directly comparable: same selection metric,
-same smoothing, same patience, same batching, same number of seeds.
 """
 
 from Model_lib import (SessionDataset, collate_fn, SkipLSTM, train_epoch,
@@ -17,26 +14,13 @@ import json
 import copy
 from Loss_functions import get_loss_criterion, parse_args, DrRLLoss, PWTSLoss
 
-_fs = argparse.ArgumentParser(add_help=False)
-_fs.add_argument('--feature-set', type=str, default=None,
-                 choices=['audio-only', 'behavioural-only', 'all'],
-                 help='Which features to use (feature ablation)')
-_requested = _fs.parse_known_args()[0].feature_set
-is_ablation = _requested is not None          # an ordinary run passes nothing
-feature_set = _requested or 'all'
-
 audio_features = ['tempo', 'mode', 'danceability', 'energy', 'loudness',
                   'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence']
 
 behavioural_features = ['historical_skip_rate', 'historical_artist_skip_rate',
                         'shuffle', 'is_repeat_track', 'same_artist_as_prev']
 
-if feature_set == 'audio-only':
-    features = audio_features
-elif feature_set == 'behavioural-only':
-    features = behavioural_features
-else:
-    features = audio_features + behavioural_features
+features = audio_features + behavioural_features
 target = 'skipped'
 
 BATCH_SIZE = 64
@@ -65,10 +49,9 @@ with open(params_path, 'r') as f:
     best_params = json.load(f)
 
 print(f"Loaded best params: {best_params}")
-print(f"Feature set: {feature_set} ({len(features)} features)")
+print(f"Using {len(features)} features")
 
 
-TAG = '' if feature_set == 'all' else f'_{feature_set.replace("-", "")}'
 
 print("Loading datasets...")
 train_dataset = SessionDataset('../RAW Data/training_data.parquet', features, target)
@@ -147,7 +130,7 @@ def run_training(seed, verbose=True):
     return best, best_state
 
 
-# -- Main ---------------------------------------------------------------------
+#Main
 
 runs = []
 best_overall = (-np.inf, None)
@@ -158,11 +141,11 @@ for seed in range(N_RUNS):
     runs.append(result)
     print(f"Run {seed+1}: NDCG {result['val_ndcg']:.4f} | AUC {result['val_auc']:.4f} "
           f"| best epoch {result['epoch']} of {result['epochs_run']}")
-    torch.save(state, f'../Models/lstm_{loss_name}{TAG}_seed{seed}.pt')
+    torch.save(state, f'../Models/lstm_{loss_name}_seed{seed}.pt')
     if result['val_ndcg'] > best_overall[0]:
         best_overall = (result['val_ndcg'], state)
 
-torch.save(best_overall[1], f'../Models/lstm_{loss_name}{TAG}_best.pt')
+torch.save(best_overall[1], f'../Models/lstm_{loss_name}_best.pt')
 
 ndcgs = np.array([r['val_ndcg'] for r in runs])
 aucs = np.array([r['val_auc'] for r in runs])
@@ -171,14 +154,12 @@ print(f"\n=== SkipLSTM / {loss_name.upper()} across {N_RUNS} seeds ===")
 print(f"NDCG@5 : {ndcgs.mean():.4f} +/- {ndcgs.std():.4f}   {np.round(ndcgs, 4).tolist()}")
 print(f"AUC    : {aucs.mean():.4f} +/- {aucs.std():.4f}   {np.round(aucs, 4).tolist()}")
 print(f"epochs : {[r['epochs_run'] for r in runs]}  (best at {[r['epoch'] for r in runs]})")
-print(f"Model saved to ../Models/lstm_{loss_name}{TAG}_best.pt")
+print(f"Model saved to ../Models/lstm_{loss_name}_best.pt")
 
-LOG = ('../Models/feature_ablation_study.csv' if is_ablation
-       else '../Models/test_log.csv')
+LOG = '../Models/test_log.csv'
 
 log_test({
     'model': 'SkipLSTM',
-    'feature_set': feature_set,
     'n_features': len(features),
     'session_auc': round(float(aucs.mean()), 4),
     'session_ndcg5': round(float(ndcgs.mean()), 4),

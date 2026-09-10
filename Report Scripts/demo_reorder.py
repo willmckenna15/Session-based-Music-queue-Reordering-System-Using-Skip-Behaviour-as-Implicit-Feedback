@@ -1,8 +1,9 @@
 """Run the best model on one test session and print the reordered queue.
 
-    python3 demo_reorder.py                 # auto-pick a readable session
-    python3 demo_reorder.py --session <id>  # a specific one
-    python3 demo_reorder.py --context 6     # set the split point
+    python3 demo_reorder.py                 # random session, random split point
+    python3 demo_reorder.py --session <id>  # a specific session
+    python3 demo_reorder.py --context 6     # a specific split point
+    python3 demo_reorder.py --pick-seed 7   # reproduce a particular draw
 """
 
 import argparse
@@ -17,7 +18,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 '..', 'Model Scripts'))
 
-from Model_lib import SkipLSTM, ndcg_at_k, fast_auc, valid_splits, pick
+from Model_lib import SkipLSTM, ndcg_at_k, fast_auc, valid_splits
 
 FEATURES = ['tempo', 'mode', 'danceability', 'energy', 'loudness', 'speechiness',
             'acousticness', 'instrumentalness', 'liveness', 'valence',
@@ -29,7 +30,8 @@ DATA = '../RAW Data/testing_data.parquet'
 
 cli = argparse.ArgumentParser()
 cli.add_argument('--session', default=None)
-cli.add_argument('--context', type=int, default=13)
+cli.add_argument('--context', type=int, default=None,
+                 help='split point; drawn at random from the valid ones if omitted')
 cli.add_argument('--min-len', type=int, default=20)
 cli.add_argument('--max-len', type=int, default=40)
 cli.add_argument('--pick-seed', type=int, default=None)
@@ -38,6 +40,8 @@ opts = cli.parse_args()
 df = pd.read_parquet(DATA, columns=FEATURES + ['skipped', 'session_id', 'ts',
                                                'Track Name', 'Artist Name'])
 df = df.dropna(subset=FEATURES)
+
+rng = np.random.default_rng(opts.pick_seed)
 
 if opts.session:
     sid = opts.session
@@ -48,7 +52,7 @@ else:
               (skips >= 3) & (skips <= size - 3)]
     if ok.empty:
         raise SystemExit('No session matched; widen --min-len/--max-len.')
-    sid = np.random.default_rng(opts.pick_seed).choice(ok.index)
+    sid = rng.choice(ok.index)
 
 
 s = df[df.session_id == sid].sort_values('ts').reset_index(drop=True)
@@ -57,18 +61,16 @@ L = len(s)
 splits = valid_splits(y, L)
 if not splits:
     raise SystemExit(f'{sid}: no valid split under the evaluation protocol.')
-if opts.context is not None:
-    if opts.context not in splits:
-        raise SystemExit(f'context {opts.context} is not a valid split; '
-                         f'options are {splits}')
+if opts.context is None:
+    # a random context length among those the evaluation protocol admits, so the
+    # demo shows the model at an arbitrary point in the session rather than a
+    # chosen one. valid_splits already guarantees 3 <= b <= L - 5.
+    b = int(rng.choice(splits))
+elif opts.context in splits:
     b = opts.context
 else:
-    chosen = pick(splits)                   
-    b = chosen[len(chosen) // 2]             
-
-b = opts.context if opts.context is not None else max(3, L // 3)
-if not 3 <= b <= L - 5:
-    raise SystemExit(f'Context {b} invalid for a session of {L} tracks.')
+    raise SystemExit(f'context {opts.context} is not a valid split; '
+                     f'options are {splits}')
 
 params = json.load(open(PARAMS))
 model = SkipLSTM(input_size=len(FEATURES),
